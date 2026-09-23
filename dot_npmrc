@@ -1,7 +1,7 @@
 registry=https://registry.npmmirror.com
 prefix=D:\npm-global
 cache=D:\npm-cache
-allow-scripts=esbuild,@google/genai,protobufjs
+allow-scripts=@google/genai,protobufjs
 @scarf:registry=https://0.0.0.0/
 @segment:registry=https://0.0.0.0/
 @amplitude:registry=https://0.0.0.0/
