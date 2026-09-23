@@ -15,26 +15,32 @@
 (add-hook 'after-init-hook
           (lambda () (setq gc-cons-threshold (* 8 1024 1024))))
 
-;;;; 包后端
+;;;; 包后端配置
+;; 注意：这里只做「配置」，不调 package-initialize / package-activate-all。
+;; Emacs 启动流程会自动在 init.el 之前激活已装包（batch 模式会跳过）。
+;; 激活逻辑统一放到 init.el 开头，这样 batch 模式也能工作。
 (require 'package)
+;; Windows 上 MSYS 默认目录会污染 GPG 路径，显式用 locate-user-emacs-file 绝对化
+(setq package-gnupghome-dir (locate-user-emacs-file "elpa/gnupg" "gnupg"))
+(make-directory package-gnupghome-dir t)
+;; Emacs 31 把 package-check-signature 做成了「可绑定的 defalias」，
+;; setq 完全有效（实测 archive-contents 刷新无签名错误）。
+;; HTTPS 已提供完整性保证，关掉签名检查更稳定。
+(setq package-check-signature nil)
 (setq package-archives
       '(("melpa"  . "https://melpa.org/packages/")
         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
         ("gnu"    . "https://elpa.gnu.org/packages/"))
       package-menu-async t
       ;; Custom 面板写出去的东西另存，不污染配置本体
-      ;; （doom/custom.el 里那坨 org-agenda-files/package-selected-packages 就是这么来的）
       custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file) (load custom-file))
-(package-initialize)
 
 ;;;; Windows 文件系统性能（真正的 Windows 卡顿源头之一）
 (when (memq system-type '(windows-nt ms-dos cygwin))
   ;; w32-get-true-file-attributes 对每个文件多查一次安全描述符
   (when (boundp 'w32-get-true-file-attributes) (setq w32-get-true-file-attributes nil))
-  (when (boundp 'w32-pipe-read-delay)         (setq w32-pipe-read-delay 0))
-  ;; 关闭包启动期自动装载，交给 init.el 里 use-package 按需触发
-  (setq package-enable-at-startup nil))
+  (when (boundp 'w32-pipe-read-delay)         (setq w32-pipe-read-delay 0)))
 
 (provide 'early-init)
 ;;; early-init.el ends here

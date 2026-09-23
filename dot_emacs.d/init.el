@@ -22,6 +22,12 @@
 
 ;;; Code:
 
+;;;; §前置：包后端激活（early-init.el 只做配置，这里统一激活）
+;; Emacs 启动流程在 batch 模式下会跳过 package-activate-all，
+;; 显式调 package-initialize 确保所有已装包进 load-path，
+;; use-package 的 :ensure t 才能正确触发后续包安装。
+(package-initialize)
+
 ;;;; §0 顶层开关（改这里即可，模块会读取）──────────────────────────────
 (defvar my/evil-p t
   "非 nil 启用 evil（vim 键位）。想要纯 Emacs 键位改成 nil。")

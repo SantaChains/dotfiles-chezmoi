@@ -3,12 +3,17 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/nvim-telescope/telescope-symbols.nvim", name = "telescope-symbols" },
 	{ src = "https://github.com/nvim-telescope/telescope-ui-select.nvim", name = "telescope-ui-select" },
-	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf" },
+	{
+		src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
+		name = "telescope-fzf",
+		build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+		cond = function()
+			return vim.fn.executable("cmake") == 1
+		end,
+	},
 	{ src = "https://github.com/nvim-telescope/telescope-file-browser.nvim", name = "telescope-file-browser" },
 	{ src = "https://github.com/2kabhishek/nerdy.nvim", name = "telescope-nerdy" },
 })
-
-vim.api.nvim_set_hl(0, "TelescopeBorder", { fg = "#89b4fa" })
 
 local actions = require("telescope.actions")
 require("telescope").setup({
@@ -58,6 +63,7 @@ require("telescope").setup({
 	},
 })
 
+pcall(require("telescope").load_extension, "fzf")
 require("telescope").load_extension("file_browser")
 require("telescope").load_extension("ui-select")
 require("telescope").load_extension("nerdy")

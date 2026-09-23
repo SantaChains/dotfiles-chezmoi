@@ -5,19 +5,31 @@ vim.g.maplocalleader = ","
 local scrolloff = math.floor(vim.o.lines / 2) - 3
 vim.opt.scrolloff = scrolloff
 
+-- Must be set before plugins that depend on it (colorizer)
+vim.opt.termguicolors = true
+vim.opt.hlsearch = false
+vim.opt.incsearch = true
+
 require("plugins.init")
 require("config.autocmd")
 require("config.binds")
 
--- Colorcheme
-vim.cmd.colorscheme("catppuccin-nvim")
+-- Colorscheme
+vim.cmd.colorscheme("catppuccin")
+
+-- Transparent background fallback
+vim.api.nvim_create_augroup("user_colors", { clear = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
+	group = "user_colors",
+	callback = function()
+		vim.api.nvim_set_hl(0, "Normal", { ctermbg = "NONE", guibg = "NONE" })
+	end,
+})
 
 -- Line numbers
 vim.opt.cursorline = true
 vim.wo.relativenumber = true
 vim.wo.number = true
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#6c7086" }) -- overlay0
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#cba6f7", bold = true }) -- mauve
 
 -- Windows
 vim.opt.splitbelow = true
@@ -33,13 +45,19 @@ vim.opt.expandtab = false
 -- Undo management
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = vim.fn.expand("$HOME") .. "/.vim/undodir"
+vim.opt.writebackup = false
+local undodir = vim.fn.expand("~") .. "/.vim/undodir"
+vim.fn.mkdir(undodir, "p")
+vim.opt.undodir = undodir
 vim.opt.undofile = true
 
--- Better Highlighting
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
-vim.opt.termguicolors = true
+-- Clipboard + Fold
+vim.opt.clipboard = "unnamedplus"
+vim.opt.foldlevelstart = 99
+
+-- Mouse + autoread
+vim.opt.mouse = "a"
+vim.opt.autoread = true
 
 -- Nowrap
 vim.opt.wrap = false
@@ -50,9 +68,6 @@ vim.o.autoindent = true
 -- Local project config
 vim.o.exrc = true
 
--- Ignore case and some flash nvim stuff
+-- Ignore case
 vim.o.ignorecase = true
 vim.o.smartcase = true
-vim.api.nvim_set_hl(0, "FlashMatch", { fg = "#cba6f7", bold = true }) -- overlay0
-vim.api.nvim_set_hl(0, "FlashLabel", { fg = "#1e1e2e", bg = "#f38ba8", bold = false }) -- overlay0
-vim.api.nvim_set_hl(0, "FlashCurrent", { bg = "#cba6f7", fg = "#1e1e2e", bold = true }) -- overlay0

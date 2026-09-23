@@ -18,6 +18,46 @@ vim.lsp.config("lua_ls", {
 		},
 	},
 })
+
+vim.lsp.config("rust_analyzer", {
+	cmd = { "rustup", "run", "stable", "rust-analyzer" },
+})
+
+vim.lsp.config("gopls", {
+	settings = {
+		gopls = {
+			gofumpt = true,
+		},
+	},
+	flags = { debounce_text_changes = 150 },
+})
+
+vim.lsp.config("yamlls", {
+	settings = {
+		yaml = {
+			schemas = {
+				["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+			},
+		},
+	},
+})
+
+vim.lsp.config("hls", {
+	settings = {
+		haskell = {
+			cabalFormattingProvider = "cabalfmt",
+			formattingProvider = "ormolu",
+		},
+	},
+	single_file_support = true,
+})
+
+vim.lsp.config("golangci_lint_ls", {})
+
+vim.lsp.config("ltex", {
+	diagnostics = { disable = { "missing-fields" } },
+})
+
 vim.lsp.enable({
 	"lua_ls",
 	"ts_ls",
@@ -25,12 +65,15 @@ vim.lsp.enable({
 	"cssls",
 	"svelte",
 	"rust_analyzer",
+	"gopls",
+	"golangci_lint_ls",
+	"yamlls",
+	"hls",
+	"ltex",
 	"emmet_language_server",
 })
 
 vim.o.winborder = "rounded"
-
-vim.api.nvim_set_hl(0, "BlinkCmpMenuBorder", { fg = "#89b4fa" })
 
 require("blink.cmp").build():pwait()
 

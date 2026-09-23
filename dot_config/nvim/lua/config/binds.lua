@@ -121,3 +121,30 @@ end)
 Keymap("n", "<C-T>q", function()
 	vim.cmd("tabclose")
 end)
+
+-- Buffer navigation
+Keymap("n", "L", "<cmd>bnext<cr>")
+Keymap("n", "H", "<cmd>bprevious<cr>")
+
+-- Extra telescope
+Keymap("n", "<leader>sb", function()
+	builtin.current_buffer_fuzzy_find({
+		sorting_strategy = "ascending",
+		prompt_position = "top",
+	})
+end)
+Keymap("n", "<leader>cx", "<cmd>Telescope diagnostics<cr>")
+
+-- LSP native (no Lspsaga dependency)
+Keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
+Keymap("n", "cd", "<cmd>Telescope lsp_definitions<CR>")
+Keymap("n", "cr", "<cmd>Telescope lsp_references<CR>")
+Keymap("n", "<C-j>", "<cmd>Telescope lsp_document_symbols<CR>")
+Keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+Keymap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>")
+Keymap("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>")
+Keymap("n", "<leader>ci", "<cmd>Telescope lsp_implementations<CR>")
+Keymap("n", "<leader>D", "<cmd>Telescope lsp_type_definitions<CR>")
+Keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
+Keymap("n", "<leader>cp", "<cmd>lua vim.diagnostic.goto_next()<CR>")
+Keymap("n", "<leader>cn", "<cmd>lua vim.diagnostic.goto_prev()<CR>")

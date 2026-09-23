@@ -20,9 +20,9 @@ require("mini.indentscope").setup({ -- shows indents
 
 require("mini.trailspace").setup() -- Shows useless spaces
 
-require("mini.sessions").setup({ -- dir based session management
-	autoread = true,
-	autowrite = true,
+require("mini.sessions").setup({ -- dir based session management (autosave/recovery handled by remember.nvim)
+	autoread = false,
+	autowrite = false,
 	file = ".session",
 	force = { read = false, write = true, delete = true },
 })

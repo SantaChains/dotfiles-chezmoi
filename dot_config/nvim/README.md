@@ -1,94 +1,171 @@
-# NVIM For Voidfiles
+# NVIM
 
-Built using vim.pack and lots of mini plugins
+chezmoi-managed Neovim config. Target: `~/.config/nvim`.
 
-## Installation
+Requires Neovim 0.11+ (tested on 0.12.5). Uses built-in `vim.pack` plugin manager.
 
-This config uses nix-wrapper-modules to forego needing to install dotfiles at all. This results in a cleaner,
-more consistent experience across systems, in order to make it available to a dendritic nix environment.
+## Install
 
-### Trying
-
-To try the config:
-
-```bash
-nix run git+https://git.voidarc.co.uk/voidarc/nvim
+```powershell
+chezmoi apply
 ```
 
-### Installing
+First run will auto-install all plugins. Startup log shows `vim.pack: Installing plugins` — wait for it.
 
-Add the input to your flake:
+## Requirements
 
-```nix
-{
-    inputs = {
-        nvim-voidarc.url = "git+https://git.voidarc.co.uk/voidarc/nvim"
-    }
-}
+- Neovim >= 0.11
+- git (clone plugins)
+- cmake (optional, only needed to build telescope-fzf-native C binary; if absent the config skips fzf-native and Telescope falls back to its Lua sorter)
+- ripgrep (`rg`) — Telescope live_grep backend
+- fd — Telescope find_files preferred backend
+- A Nerd Font — lualine icons + noice rendering
+
+## Structure
+
+```
+nvim/
+├── init.lua                       entry point: options, plugins.init, config, colorscheme
+└── lua/
+    ├── config/
+    │   ├── autocmd.lua            git fetch on VimEnter, cursorline toggle, autosave notifications,
+    │                              InsertEnter center-cursor, Go organize-imports, LSP reference highlight
+    │   └── binds.lua              Keymap() helper + all keybindings
+    └── plugins/
+        ├── init.lua               auto-loader: walks plugins/**/*.lua (except init.lua itself)
+        ├── debug.lua              dap + dap-go + dapui + dap-virtual-text + nvim-nio + keymaps
+        ├── completion/
+        │   ├── lspconfig.lua      vim.lsp.config() servers, blink.cmp, lazydev on FileType=lua
+        │   ├── conform.lua        formatters_by_ft, format_on_save, nvim-lint, diagnostic virtual_text
+        │   └── treesitter.lua     highlight + indent + 16 languages
+        ├── ui/
+        │   ├── carbonfox.lua      nightfox carbonfox variant + transparent + vimade fade
+        │   ├── colorizer.lua      #hex / rgb() / hsl() 实时颜色高亮
+        │   ├── lualine.lua        mode + macro indicator + branch/diagnostics + ctime
+        │   └── noice.lua          cmdline view + notify + mini view
+        └── utils/
+            ├── telescope.lua       fuzzy finder + fzf-native(cmake cond) + file_browser + ui-select
+            ├── mini.lua           pairs, ai, cursorword, indentscope, trailspace, sessions,
+            │                      surround, move, icons, animate
+            └── convenience.lua    auto-save + remember + scrollEOF + undotree keymap
 ```
 
-And then add the package to your system config:
+## Keybinds
 
-```nix
-inputs.nvim-voidarc.packages.${stdenv.hostPlatform.system}.default
-```
+Leader is `<Space>`. Localleader is `,`.
 
-There is also a `minimal` output that doesn't install any lsps, only installing required pacakges so that the plugins
-function correctly (ripgrep, luarocks, luajit, etc)
+### Navigation
 
-### Editing and Developing
+| Bind           | What                                           |
+|----------------|------------------------------------------------|
+| `<leader>ff`   | Telescope find_files (hidden)                  |
+| `<leader>fg`   | Telescope live_grep (hidden)                   |
+| `<leader>fb`   | Telescope buffers                              |
+| `<leader>fn`   | Telescope file_browser at current file's dir   |
+| `<leader>sb`   | Telescope current_buffer_fuzzy_find (top-down) |
+| `<leader>cx`   | Telescope diagnostics (workspace)              |
+| `H` / `L`      | Previous / next buffer                         |
+| `<C-t>h/l/j/q` | Tab previous / next / new / close              |
+| `<leader>bd`   | Delete buffer                                  |
 
-You can clone this repo to `.config/nvim`, and then use a nix-shell to use a local config instead of the provided
-bundled binary. This is useful if you want to make modifications to the config and don't want to wait for a push
-and rebuild to see your changes. This is the only reason I kept the main config in lua, other than having to rewrite
-it in general.
+### LSP
 
-## Usage
+| Bind                        | What                        |
+|-----------------------------|-----------------------------|
+| `K`                         | Hover doc                   |
+| `gd`                        | Go to definition            |
+| `cd`                        | Telescope definitions       |
+| `cr`                        | Telescope references        |
+| `gi`                        | Go to implementation        |
+| `<leader>ci`                | Telescope implementations   |
+| `<leader>D`                 | Telescope type definitions  |
+| `<C-j>`                     | Telescope document symbols  |
+| `<C-k>`                     | Signature help              |
+| `<leader>ca`                | Code action                 |
+| `<leader>cr`                | Rename                      |
+| `<leader>cp` / `<leader>cn` | Diagnostic goto next / prev |
+| `<leader>d`                 | Diagnostic float            |
 
-This is a very esoteric config. I am quite opinionated, so there isn't any nice stuff like a homepage or which-keys.
-Instead, there is efficiency. This is the minimum amount of pacakges required in order to support full functionality,
-while also being highly extensible and adaptable to any programming language that I could want to program in.
+### Flash (no leader)
 
-### Keybinds
+| Bind        | What                                      |
+|-------------|-------------------------------------------|
+| `ss`        | fuzzily jump anywhere (backdrop dimmed)   |
+| `S`         | treesitter node jump                      |
+| `<leader>r` | remote flash (operate from remote target) |
+| `<leader>R` | treesitter search                         |
 
-All keybinds can be found in the `lua/config/binds.lua` file, with a few exceptions. The `Keybind` function is a shorthand for the vim api.
-All default vim bindings remain untouched, with almost all of the set binds having a leader prefix.
+### Session
 
-The leader key is space, configurable at the top of the `init.lua` file. When referring to the leader key, assume I mean space.
+手动命令由 mini.sessions 提供（`<leader>qj/qd` 操作 cwd 的 `.session` 文件），自动保存/恢复由 remember.nvim 处理。两者不冲突：mini.sessions 的 `autoread`/`autowrite` 已关闭，避免 setup 时重复扫描 session 文件并报 INFO 消息。
 
-#### Navigation
+| Bind         | What                                             |
+|--------------|--------------------------------------------------|
+| `<leader>qj` | Save session + `wqa` (creates `.session` in cwd) |
+| `<leader>qd` | Delete session + `wqa`                           |
+| `<leader>fs` | Pick session to restore                          |
+| `<leader>fd` | Pick session to delete                           |
 
-- \<leader\>ff - Open Telescope fuzzy finder
-- \<leader\>fn - Open Telescope file manager
-- \<leader\>fg - Telescope live grep (only works in git repos afaik)
-- \<leader\>fb - Telescope list of open buffers
-- \<leader\>bd - Delete focused buffer
+### Terminal
 
-If a file is open, Telescope is configured to jump to the pane/tab where that file is open, rather than open it in the current pane.
-This allows for a more consistent editing experience, such as having seperate tabs for backend and frontend files.
+| Bind         | What                         |
+|--------------|------------------------------|
+| `<leader>tj` | Terminal in new vsplit       |
+| `<leader>tk` | Terminal in new tab          |
+| `<C-D>`      | Exit terminal mode to normal |
 
-- \<C-t\>l - Next tab
-- \<C-t\>h - Previous tab
-- \<C-t\>j - New tab to the right
-- \<C-t\>q - Close tab (Keeps buffers open)
+### Edit conveniences
 
-Instead of using \<C-t\>j, I prefer to find the file in Telescope and use <C-t>, which opens the file in a new tab. This ovverides the
-regular Telescope behaviour of jumping to the relevant pane, which only applies to enter. Similarly, <C-v> in Telescope opens the
-selected file in a split to the right in the current tab. All <C-w> binds for navigating windows remain unchanged
+| Bind                                | What                                     |
+|-------------------------------------|------------------------------------------|
+| `<C-BS>`                            | Delete whole word backward (insert mode) |
+| `i` / `a` / `A` / `I` on blank line | Uses blackhole register then `cc`        |
+| `ss` / `S`                          | Flash (see above)                        |
 
-#### Editing
+### DAP (when dap installed)
 
-- \<leader\>d - Open vim.lsp.diagnostic float menu
-- gd - Go to definition of function
-- ss - Open flash.nvim menu
+| Bind         | What                   |
+|--------------|------------------------|
+| `<F1>`       | Open REPL              |
+| `<F11>`      | Continue               |
+| `<F12>`      | Terminate              |
+| `<leader>b`  | Toggle breakpoint      |
+| `<leader>B`  | Conditional breakpoint |
+| `<leader>lp` | Log point              |
+| `<leader>dt` | dap-go debug_test      |
 
-Flash nvim has no leader key for ease of access. Non-text based flash functions are available according to the binds, but I don't use them.
+## LSP servers configured
 
-#### Session management
+via `vim.lsp.config()` / `vim.lsp.enable()`:
 
-- \<leader\>qj - Save session and exit
-- \<leader\>qd - Delete session and exit
+- lua_ls — LuaJIT runtime, 3rd-party check disabled
+- ts_ls
+- pylsp
+- cssls
+- svelte
+- rust_analyzer — runs through `rustup run stable`
+- gopls — gofumpt on, debounce 150ms
+- golangci_lint_ls
+- yamlls — GitHub workflow schema
+- hls — cabalfmt + ormolu
+- ltex — `missing-fields` diagnostic disabled
+- emmet_language_server
 
-Both of these commands run `wqa`, meaning that even when deleting a session no data is ever lost (not that autosave isn't on by default lol).
-When opening nvim in a folder with a `.session` file, the session will automatically be restored, including window layout. For more info, see
-the mini.sessions documentation. Sessions autosave, but it is faster to use the save keybind than quit all windows one by one or run `:wqa`
+## Formatters (conform)
+
+| ft                           | Formatter |
+|------------------------------|-----------|
+| lua                          | stylua    |
+| js/ts/tsx/svelte/html/md/css | prettier  |
+| python                       | black     |
+| rust                         | rustfmt   |
+
+`format_on_save = true`, `undojoin = true`.
+
+## Notes
+
+- Colorscheme: nightfox carbonfox variant (near-black high-contrast, IBM Carbon palette). Transparent background — both via nightfox `options.transparent = true` and a ColorScheme autocmd that forces `Normal guibg=NONE` as fallback.
+- undodir: `~/.vim/undodir` (cross-platform via `expand("~")`), auto-created with `mkdir(path, "p")`.
+- telescope-fzf-native: has a `cond = function() return vim.fn.executable("cmake") == 1 end end`. No cmake → auto-skipped. Install cmake → next startup builds C binary for fast fuzzy sort.
+- `nvim-nio`: transitive dep of dapui 0.7+, included explicitly so `vim.pack` resolves it.
+- `vim.tbl_flatten` deprecation warning at startup: emitted by a plugin (telescope or mason), not this config.

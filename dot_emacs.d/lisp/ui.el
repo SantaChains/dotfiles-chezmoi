@@ -12,13 +12,13 @@
     (when-let* ((chosen (seq-find (lambda (f) (member f available))
                                   '("Maple Mono NF" "Cascadia Code" "Source Code Pro"
                                     "JetBrainsMono Nerd Font" "Consolas"))))
-      (set-face-attribute 'default nil :family chosen :height 115 :weight 'medium)
+      (set-face-attribute 'default nil :family chosen :height 180 :weight 'medium)
       (let ((xfd (list (cons 'font (font-xlfd-name
-                                   (font-spec :family chosen :size 13))))))
+                                   (font-spec :family chosen :size 18))))))
         (setq initial-frame-alist (append xfd initial-frame-alist)
               default-frame-alist (append xfd default-frame-alist))))
     (when (member "Segoe UI" available)
-      (set-face-attribute 'variable-pitch nil :family "Segoe UI" :height 115))))
+      (set-face-attribute 'variable-pitch nil :family "Segoe UI" :height 180))))
 
 ;;;; 去掉 GUI 噪音 + 基础光标/行号
 (menu-bar-mode -1)

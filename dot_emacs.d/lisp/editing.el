@@ -46,6 +46,7 @@
 
 ;;;; Evil（前置变量必须在 require evil 之前）
 (setq evil-want-keyword nil
+      evil-want-keybinding nil
       evil-want-C-u-scroll t
       evil-respect-visual-line-mode t
       evil-search-module 'evil-search)   ; 注意：变量是 evil-search-module，同名函数是另一回事
@@ -53,43 +54,43 @@
   :config
   (when my/evil-p (evil-mode 1))
   (when (fboundp 'evil-set-undo-system) (evil-set-undo-system 'undo-redo))
-  (key-set evil-normal-state-map (kbd "K") #'xref-find-definitions))
+  (evil-define-key 'normal evil-normal-state-map (kbd "K") #'xref-find-definitions))
 (use-package evil-collection
   :ensure t :after evil :config (evil-collection-init))
 
-;;;; Leader 键位（general，配 SPC 前缀 = Doom 手感）
+;;;; Leader 键位（general + evil override keymap，实现 Doom 风格 SPC 前缀）
+;; 关键：evil 的 override keymap 优先级最高，general 通过它把 SPC 从默认的
+;; self-insert 替换成真正的 prefix keymap，才能避免 "starts with non-prefix key SPC"。
 (use-package general :ensure t :after evil
   :config
+  (when my/evil-p (general-evil-setup t))
   (general-create-definer my/leader
-    :keymaps '(normal visual motion emacs) :prefix "SPC"
-    :global-prefix (if my/evil-p nil my/leader-key))
+    ;; evil 模式用 override keymap（覆盖一切 evil 默认绑），
+    ;; 非 evil 模式走 normal/visual 的 standard-map
+    :keymaps (if my/evil-p 'override '(normal visual))
+    :prefix (if my/evil-p "SPC" my/leader-key))
   (my/leader
-    "b" '(:ignore t :which-key "buffer")
+    "b"  '(:ignore t :which-key "buffer")
     "bb" '(:ignore consult-buffer :which-key "buffers")
     "bd" '(:ignore kill-this-buffer :which-key "kill")
-    "e" '(:ignore t :which-key "edit")
+    "e"  '(:ignore t :which-key "edit")
     "ee" '(:ignore find-file :which-key "find file")
     "er" '(:ignore consult-recent-file :which-key "recent files")
     "ef" '(my/edit-init :which-key "edit init.el")
-    "g" '(:ignore t :which-key "git")
+    "g"  '(:ignore t :which-key "git")
     "gg" '(:ignore magit-status :which-key "magit")
-    "l" '(:ignore t :which-key "lsp")
+    "l"  '(:ignore t :which-key "lsp")
     "ll" '(:ignore eglot :which-key "eglot")
     "lr" '(:ignore consult-imenu :which-key "imenu")
     "ln" '(:ignore eglot-rename :which-key "rename")
-    "s" '(:ignore t :which-key "search/jump")
+    "s"  '(:ignore t :which-key "search/jump")
     "ss" '(:ignore avy-goto-char-timer :which-key "avy")
     "sl" '(:ignore consult-line :which-key "line")
-    "d" '(:ignore t :which-key "debug")
+    "d"  '(:ignore t :which-key "debug")
     "dd" '(:ignore dape :which-key "dape")
-    "u" '(:ignore t :which-key "ui")
+    "u"  '(:ignore t :which-key "ui")
     "uz" '(:ignore zoom-window :which-key "zoom")
-    "qq" '(:ignore save-buffers-kill-terminal :which-key "quit"))
-  ;; 不用 evil 时也给一套 C-c 前缀的等价键
-  (unless my/evil-p
-    (global-set-key (kbd "C-c s s") #'avy-goto-char-timer)
-    (global-set-key (kbd "C-c g g") #'magit-status)
-    (global-set-key (kbd "C-c e e") #'eglot)))
+    "qq" '(:ignore save-buffers-kill-terminal :which-key "quit")))
 
 ;;;; 跳转 / 视觉辅助 / 折叠
 (use-package avy :ensure t :custom (avy-timeout-seconds 0.3))

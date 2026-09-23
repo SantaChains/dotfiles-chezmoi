@@ -5,19 +5,11 @@ vim.pack.add({
 
 require("catppuccin").setup({
 	flavour = "mocha",
-	transparent_background = true, -- disables setting the background color.
-	float = {
-		transparent = true, -- enable transparent floating windows
-		solid = true, -- use solid styling for floating windows, see |winborder|
-	},
-	show_end_of_buffer = true, -- shows the '~' characters after the end of buffers
-	term_colors = false,
-	auto_integrations = true,
-	integrations = {
-		cmp = true,
-		blink_cmp = {
-			style = "bordered",
-		},
+	transparent_background = true,
+	term_colors = true,
+	custom_highlights = {
+		LineNr = { fg = "#89b4fa" },
+		CursorLineNr = { fg = "#f5c2e7", bold = true },
 	},
 })
 require("vimade").setup({

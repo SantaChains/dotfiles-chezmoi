@@ -43,3 +43,7 @@ AppData/Local/clangd/index
 AppData/Local/clangd/.history
 **/clangd/index
 
+# vim.pack 自动生成的 lockfile:每次插件变动会变,不进源仓库
+dot_config/nvim/nvim-pack-lock.json
+**/nvim-pack-lock.json
+
