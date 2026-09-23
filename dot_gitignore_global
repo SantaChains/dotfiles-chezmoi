@@ -18,7 +18,8 @@ Session.vim
 .vscode/
 .idea/
 
-# 误提交防线：本地凭据与私钥（本仓库历史上泄露过一次 LLM key，这层默认挡在 gitignore 里）
+# 凭据与私钥类：注意这是全局排除，对**所有**仓库生效（含 chezmoi 源本身），
+# 真要纳管其中某个文件必须 git add -f；不想要这层就把下面 8 行删掉。
 .env
 .env.*
 !.env.example
