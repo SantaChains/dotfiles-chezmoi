@@ -1,5 +1,6 @@
 # 全局 gitignore（chezmoi 管理：源 dot_gitignore_global → 目标 ~/.gitignore_global）
-# 只放"跨所有仓库都不该进版本库"的东西；具体仓库若要反向纳入，用 git add -f。
+# 只放"任何仓库都不会合法提交"的东西。判据：具体仓库能用 !pattern 反向救回，
+# 但被目录型规则（如 .history/）排除的路径 git 不会下进入，仓库级 ! 也救不回，只能 git add -f。
 
 # 操作系统垃圾
 .DS_Store
@@ -8,21 +9,26 @@ ehthumbs.db
 desktop.ini
 $RECYCLE.BIN/
 
-# 编辑器 / 终端的临时与历史产物（.history/ = VS Code Local History；*.session = 会话缓存）
+# 编辑器 / 终端的临时与历史产物（.history/ = VS Code Local History）
 *.swp
 *.swo
 *~
 Session.vim
 .history/
 *.tmp
-.vscode/
-.idea/
+# 注：.vscode/ 与 .idea/ 不放在这里。它们常常是需要提交的项目配置
+# （settings.json / launch.json / extensions.json / codeStyles），
+# 而目录被全局排除后仓库级 ! 无法救回 -> 交给具体仓库自己的 .gitignore 决定。
 
-# 凭据与私钥类：注意这是全局排除，对**所有**仓库生效（含 chezmoi 源本身），
-# 真要纳管其中某个文件必须 git add -f；不想要这层就把下面 8 行删掉。
+# 环境变量文件：真实值永不入库，模板保留
 .env
 .env.*
 !.env.example
+!.env.template
+!.env.dist
+
+# 私钥与证书类（明文）。注：chezmoi 用 --encrypt 生成的 *.age 名字不同，
+# 不会被这里吃掉（实测 id_ed25519.age 不受影响），所以不阻碍纳管密文。
 *.pem
 *.p12
 *.pfx
