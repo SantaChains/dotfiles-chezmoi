@@ -1,0 +1,29 @@
+# 全局 gitignore（chezmoi 管理：源 dot_gitignore_global → 目标 ~/.gitignore_global）
+# 只放"跨所有仓库都不该进版本库"的东西；具体仓库若要反向纳入，用 git add -f。
+
+# 操作系统垃圾
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# 编辑器 / 终端的临时与历史产物（.history/ = VS Code Local History；*.session = 会话缓存）
+*.swp
+*.swo
+*~
+Session.vim
+.history/
+*.tmp
+.vscode/
+.idea/
+
+# 误提交防线：本地凭据与私钥（本仓库历史上泄露过一次 LLM key，这层默认挡在 gitignore 里）
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519

@@ -12,8 +12,12 @@
 	schannelCheckRevoke = false
 	sslVerify = false
 [core]
-	editor = emeditor.exe
+	# 原值 emeditor.exe 是 GUI：git commit(不带 -m) 与交互式 rebase 需要编辑器阻塞等待，
+	# GUI 常立即返回空消息 -> "Aborting commit due to empty commit message"。改用终端内的 nvim。
+	editor = nvim
 	quotepath = false
+	# 由 chezmoi 源 dot_gitignore_global 下发；git_config 的 ~/ 形式比 $HOME 写法稳
+	excludesFile = ~/.gitignore_global
 [safe]
 	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
 	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
@@ -73,5 +77,33 @@
 [merge]
 	conflictStyle = zdiff3
 [rerere]
+	# 之前只配了 autoupdate/autoresolve，缺 enabled -> rerere 实际一直是关闭状态
+	enabled = true
 	autoupdate = true
 	autoresolve = true
+
+# ── 本次补充（每条都实测过依赖，勿随意删） ────────────────────────────
+[init]
+	defaultBranch = main
+
+# rebase 拉取避免 merge commit；配套 pf = push --force-with-lease 使用。
+# autoStash 必需：本仓库常有未同步漂移，脏工作区会让 rebase 直接中止。
+[pull]
+	rebase = true
+
+[rebase]
+	autostash = true
+
+# 新分支首次 push 免 -u，否则 alias p/pf 会撞 "no upstream branch"
+[push]
+	autoSetupRemote = true
+
+[alias]
+	st = status
+	cm = commit -m
+	p = push
+	pf = push --force-with-lease
+	wa = worktree add
+	wl = worktree list
+	wd = worktree remove
+	pretty = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
