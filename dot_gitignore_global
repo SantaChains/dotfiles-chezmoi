@@ -34,3 +34,173 @@ Session.vim
 *.pfx
 id_rsa
 id_ed25519
+
+# ══ 以下为候选清单，默认**全部关闭**（行首保留 `# `），按需去掉启用 ══════
+# 启用前两条必读，否则会踩不可逆的坑：
+#   1) 目录型规则 `foo/` 一旦启用，具体仓库里的 `!foo/x` **救不回来**（git 不下降
+#      进入被整体排除的目录），只能 git add -f。想保留可救性就启用我写的 `foo/*` 形式。
+#   2) 行尾带 `/` 只匹配目录：`*.log/` 只会忽略名为 xxx.log 的**目录**，
+#      日志文件必须写 `*.log`（所以下面两条是分开的）。
+#   3) 注释符是 `#` 不是 `;`（`;` 是 gitconfig 的注释符；实测 `; .vscode/`
+#      会被当成一条匹配“名字以 '; ' 开头”的生效模式）。
+
+# ── IDE：VS Code / JetBrains ──
+# .vscode/*
+# !.vscode/settings.json
+# !.vscode/extensions.json
+# !.vscode/launch.json
+# !.vscode/tasks.json
+# .idea/*
+# !.idea/codeStyles/
+# !.idea/runConfigurations/
+# !.idea/inspectionProfiles/
+# *.iml
+# .vs/
+# *.user
+# .fleet/
+
+# ── 国产 AI IDE（目录名来自本机实测：Trae CN / TRAE SOLO CN、QoderCN、
+#    CodeBuddyExtension / WorkBuddyExtension、comate、Kiro、Zed 均在盘上）──
+# .qoder/*
+# !.qoder/rules/
+# .trae/*
+# !.trae/rules/
+# .codebuddy/*
+# !.codebuddy/rules/
+# .workbuddy/*
+# !.workbuddy/rules/
+# .lingma/*
+# .comate/*
+# !.comate/prompts/
+# .iflycode/*
+# .marscode/*
+# .codegeex/*
+# 你提到的 "pi"：本机无任何 pi 相关目录/CLI，确认工具全名后再补一行：
+# .pi/
+
+# ── 其他 AI IDE / coding agent（gemini、codex、claude CLI 本机未在 PATH，
+#    目录名按官方约定写上；未安装则不会匹配任何东西，无副作用）──
+# .claude/*
+# !.claude/settings.json
+# !.claude/commands/
+# !.claude/agents/
+# !.claude/skills/
+# CLAUDE.local.md
+# .codex/*
+# !.codex/config.toml
+# .gemini/*
+# !.gemini/settings.json
+# AGENTS.local.md
+# .cursor/*
+# !.cursor/rules/
+# !.cursor/mcp.json
+# .windsurf/*
+# !.windsurf/rules/
+# .kiro/*
+# !.kiro/specs/
+# !.kiro/steering/
+# .zed/*
+# !.zed/settings.json
+# .continue/*
+# .cline/*
+# .roo/*
+# .amazonq/*
+# .augment/*
+# .factory/*
+# .opencode/*
+# 注：AGENTS.md / CLAUDE.md 本身是**该提交**的项目约定，不要放进忽略。
+
+# ── 日志与通用中间物 ──
+# *.log
+# logs/
+# *.tmp
+# *.bak
+# *.orig
+# *.rej
+# *.pid
+# *.stackdump
+# *.hprof
+# hs_err_pid*.log
+# npm-debug.log*
+# yarn-error.log*
+# pnpm-debug.log*
+
+# ── 依赖目录（按本机已装栈侧重：node/bun/pnpm、uv/pixi、go、cargo、
+#    cmake+mingw、zig、flutter、dotnet）──
+# node_modules/
+# jspm_packages/
+# .pnpm-store/
+# .pnpm/
+# .npm/
+# .yarn/unplugged/
+# .yarn/install-state.gz
+# .venv/
+# .venv*/
+# venv/
+# __pycache__/
+# *.py[cod]
+# *.egg-info/
+# .eggs/
+# .pytest_cache/
+# .mypy_cache/
+# .ruff_cache/
+# .ipynb_checkpoints/
+# .coverage
+# htmlcov/
+# .pixi/
+# .tox/
+# vendor/*
+#   ^ 不写 vendor/：Go 的 vendor 常常是该提交的；/* 形式下仓库可 !vendor/xxx.go 救回
+# .gradle/
+# .kotlin/
+# .dart_tool/
+# .stack-work/
+# .cabal/
+# .nuget/
+# .bundle/
+# .terraform/
+
+# ── 构建产物 ──
+# build/*
+# dist/*
+# out/*
+# bin/*
+#   ^ 同上：有 tracked bin/ 脚本的仓库可用 !bin/setup 救回
+# target/*
+# obj/*
+# zig-cache/
+# .zig-cache/
+# zig-out/*
+# coverage/*
+# .nyc_output/
+# site/
+# .next/
+# .nuxt/
+# .svelte-kit/
+# .astro/
+# .docusaurus/
+# .turbo/
+# .rollup.cache/
+# .parcel-cache/
+# .swc/
+# .cache/
+# *.tsbuildinfo
+# .vercel/
+# .netlify/
+# .expo/
+# CMakeFiles/
+# CMakeCache.txt
+# cmake_install.cmake
+# Testing/
+# *.o
+# *.obj
+# *.class
+# *.pyd
+# *.so
+# *.dylib
+# *.pdb
+# *.ilk
+# .cxx/
+# local.properties
+# 注：*.exe / *.dll / *.jar / *.a 我没列入候选 —— 这些在很多仓库是
+# **有意提交**的预编译产物，全局挡掉会大面积误伤，交给具体仓库决定。
