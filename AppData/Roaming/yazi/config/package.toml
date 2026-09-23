@@ -1,47 +1,42 @@
 [[plugin.deps]]
-use = "yazi-rs/plugins:git"
-rev = "63f9650"
-hash = "bf6f074cd41ee33c3360341d168f9733"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:chmod"
 rev = "63f9650"
-hash = "d0ad0c1946b46a30c8489735fe8de41c"
+hash = "9e7b8f70c62b1a91ca3b7ff3ee9d85e2"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:diff"
 rev = "63f9650"
-hash = "47865a70cade14a0b9b6bc6a54f16bdb"
+hash = "5448aa1f30e5027951e9408eaf1f0482"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
 rev = "63f9650"
-hash = "c0b6cd7dc830b96e77e5c8a71eec7926"
+hash = "7306f27fc7c2f8b4c19fa9188c92f70d"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
 rev = "63f9650"
-hash = "a7ab702e1ef0c097defbc976ed34c186"
+hash = "52f58299e638a16bc1e10bda1f0b295"
 
 [[plugin.deps]]
 use = "TD-Sky/sudo"
 rev = "af70636"
-hash = "a94dcbe9266512806c677138e8591ddb"
+hash = "5f1f3deeaf08ba2089d0e7e340bf1f84"
 
 [[plugin.deps]]
 use = "ndtoan96/ouch"
 rev = "10b4627"
-hash = "3ec6a973d506665f1570a9fe08343fd8"
+hash = "2fc187349a4cce4053f3a28a3fb66f00"
 
 [[plugin.deps]]
 use = "cap153/skim"
 rev = "2e24768"
-hash = "b0365fb4387cbb2c0eaa54ee5632970c"
+hash = "d16dfcc2328ba9838cf08e9bb1e0be19"
 
 [[plugin.deps]]
 use = "cap153/skim-rg"
 rev = "e857105"
-hash = "e8a6b33ddc0f1b9ff31ecaa171db7343"
+hash = "3ecf1f79d5726efb6e4595fceba03bca"
 
 [flavor]
 deps = []

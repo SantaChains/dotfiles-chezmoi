@@ -27,8 +27,6 @@ Status:children_add(function()
 	}
 end, 500, Status.RIGHT)
 
--- 显示git文件的状态
-require("git"):setup()
 -- 跨实例复制
 require("session"):setup {
 	sync_yanked = true,
