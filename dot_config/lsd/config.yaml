@@ -1,0 +1,26 @@
+# lsd 配置  chezmoi 管理 → ~/.config/lsd/config.yaml
+# lsd 尊重 XDG_CONFIG_HOME。
+# 文档: https://github.com/lsd-rs/lsd
+
+# 不启用 classic(保留现代彩色输出)
+classic: false
+
+# 块大小
+block-size: default
+
+# 日期:相对显示(如 2 days ago);改 timestamp 可显示绝对时间
+date: relative
+
+# 颜色:终端支持时自动启用
+color:
+  when: auto
+  use-theme: true
+  theme: default
+
+# 图标:Windows 无 Nerd Font 时保持 never 以免出现方块乱码;
+# 若你的终端字体是 Nerd Font(HackNF/JetBrainsMonoNF 等),可改为 auto
+icons:
+  when: never
+
+# 不解引用符号链接
+dereference: false

@@ -1,0 +1,12 @@
+# https://clangd.llvm.org//config
+Hover:
+  ShowAKA: Yes
+CompileFlags:
+  Add: [
+      "-std=c++17", # need when using msvc
+      "-ID:\\langcode\\Qt\\6.10.2\\msvc2022_64\\include",
+      "-ID:\\Soft\\SCOOP\\apps\\boost\\1.90.0",
+      "-Wno-unused-value",
+    ]
+Diagnostics:
+  UnusedIncludes: Strict

@@ -1,0 +1,4 @@
+# OpenClaw Completion
+source "C:\Users\Jliu Pureey\.openclaw\completions\openclaw.zsh"
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"

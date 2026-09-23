@@ -1,0 +1,9 @@
+# Bun 缓存目录
+cache = "D:\\buncache\\install\\cache"
+
+# Bun 全局包安装目录
+prefix = "D:\\buncache\\install\\global"
+
+# 可选：设置国内镜像源（加速下载）
+registry = "https://registry.npmmirror.com"
+    

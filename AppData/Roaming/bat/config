@@ -1,0 +1,21 @@
+# bat 配置(Windows)  chezmoi 管理 → %APPDATA%\bat\config
+# bat 的配置是“命令行参数”风格,每行一个参数。
+# 文档: https://github.com/sharkdp/bat#configuration-file
+
+# 真彩色主题(内置可选: gruvbox-dark, base16, ansi, Monokai Extended ...)
+--theme=gruvbox-dark
+
+# 显示行号 + 网格 + 代码片段标记;去掉 header(Windows 下常显示为乱码)
+--style=grid,numbers,snip
+
+# 始终彩色输出
+--color=always
+
+# 分页:auto(有内容才分页);如需直接输出用 never
+--paging=auto
+
+# 不自动换行(长行保持原样,横向滚动)
+--wrap=never
+
+# bat 0.23+ 内置集成 delta 作为 diff 渲染(与你命令行 git / lazygit 保持统一)
+--delta=enabled

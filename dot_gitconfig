@@ -1,0 +1,77 @@
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[user]
+	name = pureey
+	email = 148528901+SantaChains@users.noreply.github.com
+[http]
+	proxy = http://127.0.0.1:6857
+	sslBackend = schannel
+	schannelCheckRevoke = false
+	sslVerify = false
+[core]
+	editor = emeditor.exe
+	quotepath = false
+[safe]
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\blink.cmp
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\bufferline.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\conform.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\flash.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\friendly-snippets
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\gitsigns.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\grug-far.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\lazy.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\lazydev.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\LazyVim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\lualine.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\mason-lspconfig.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\mason.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\mini.ai
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\mini.icons
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\mini.pairs
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\noice.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nui.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nvim-lint
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nvim-lspconfig
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nvim-treesitter-textobjects
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\nvim-ts-autotag
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\persistence.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\plenary.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\readme
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\snacks.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\todo-comments.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\tokyonight.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\trouble.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\ts-comments.nvim
+	directory = C:\\Users\\Jliu Pureey\\AppData\\Local\\nvim-data\\lazy\\which-key.nvim
+[credential "https://cnb.cool"]
+	provider = generic
+[https]
+	proxy = http://127.0.0.1:6857
+[safe]
+	directory = *
+[windows]
+	appendAtomically = false
+
+# ── delta (由 chezmoi 管理;lazygit 也已在用它,统一 diff 观感) ──
+# 安装: scoop install delta   文档: https://github.com/dandavison/delta
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = false
+	line-numbers = true
+	side-by-side = false
+	syntax-theme = Monokai Extended
+	right-align-numbers = true
+[diff]
+	colorMoved = default
+[merge]
+	conflictStyle = zdiff3
+[rerere]
+	autoupdate = true
+	autoresolve = true

@@ -1,0 +1,213 @@
+
+
+# 置顶 curl谷歌和docker pull无法同时生效的解决方案：
+# 1、
+# 网络模式是mirrored：
+# 1.wsl settings关掉自带的自动戴笠，这个自动戴笠有点问题，会导致docker pull找不到正确的地址
+# 2.戴笠工具【不需要】开启局域网连接
+# 3.然后在ubuntu子系统的~/.bashrc文件，最后添加以下设置，也就是手动设置戴笠：
+# （vim操作自己搜一下，不赘述）
+# # 设置代理环境变量（端口按实际修改）
+# export http_proxy=http://localhost:10808
+# export https_proxy=http://localhost:10808
+# export all_proxy=socks5://localhost:10808
+# 
+# 保存好 ~/.bashrc 之后
+# source ~/.bashrc
+# 使其生效
+# 2、网络模式是Nat：
+# 开了防火墙的，去防火墙设置里把你的工具设置为白名单
+# wsl settings的自动戴笠建议关闭
+# 戴笠工具里设置好【允许局域网访问】
+# ubuntu子系统的~/.bashrc文件，最后添加以下设置：
+# # 获取 Windows 主机 IP
+# host_ip=$(ip route | awk '/default/ {print $3}')
+# # 设置戴笠环境变量（端口按实际修改）
+# export http_proxy=http://$host_ip:10808
+# export https_proxy=http://$host_ip:10808
+# export all_proxy=socks5://$host_ip:10808
+# 保存好~/.bashrc之后
+# source ~/.bashrc
+
+
+
+# 分析规范并排版代码,但先分类设置,哪些git的,bash的,ucrt的wsl pwsh和pwsh模块的,x-cmd的,禁用的仍然保持禁用,按优先级排版顺序,但pwsh优先
+# 仅在交互式、非 POSIX 模式下启用
+if [ -z "$BASH_VERSION" ] || [ -z "$PS1" ]; then
+    return
+fi
+
+# 启用可编程补全功能（如果 /etc/bash.bashrc 和 /etc/profile 等系统文件已启用，可无需重复配置）
+# 检查当前环境是否为非 POSIX 模式（避免与极简环境冲突）
+# if ! shopt -oq posix; then
+#     # 优先加载较新的 bash-completion 路径（多数现代 Linux 发行版用此）
+#     if [ -f /usr/share/bash-completion/bash_completion ]; then
+#         . /usr/share/bash-completion/bash_completion
+#     # 兼容旧版系统路径（如部分老版本 CentOS、Debian 等）
+#     elif [ -f /etc/bash_completion ]; then
+#         . /etc/bash_completion
+#     fi
+# fi
+
+#NAT        模式(局域网),防火墙开启软件和代理
+# 获取主机IP
+#host_ip=$(ip route | awk'/default/{print $3}')
+#or Tun模式
+# export http_proxy=http://$host_ip:6857
+# export https_proxy=https://$host_ip:6857
+# exprot all_proxy=socks://$host_ip:6857
+
+
+# Mirrored 模式使用,wsl setting关闭自动代理
+# auto_proxy
+# 不开启局域网(端口6857)
+# export http_proxy=http://localhost:6857
+# export https_proxy=https://localhost:6857
+# export all_proxy=socks://localhost:6857
+
+
+# export ACCOUNT=<Your ACCOUNT> # just for cloudflare
+
+# ---------------------------------------------------------
+# 0. 安全开关：非交互式 shell 直接返回
+# ---------------------------------------------------------
+# case $- in
+#     *i*) ;;
+#       *) return;;
+# esac
+
+# ---------------------------------------------------------
+# 1. 核心环境变量
+# ---------------------------------------------------------
+# 1-1 代理自动探测（仅 WSL 交互式 shell）
+# if [[ -t 0 && -z "${WSLENV}" ]]; then
+#     HOST_IP=$(awk '/nameserver/{print $2}' /etc/resolv.conf | head -n1)
+#     PROXY_PORT=6857            # 按需修改
+#     http_proxy="http://${HOST_IP}:${PROXY_PORT}"
+#     https_proxy="$http_proxy"
+# 
+#     timeout 1 bash -c ">/dev/tcp/${HOST_IP}/${PROXY_PORT}" 2>/dev/null && {
+#         export http_proxy https_proxy all_proxy="$http_proxy"
+#         export HTTP_PROXY HTTPS_PROXY ALL_PROXY="$http_proxy"
+#     }
+# fi
+
+# 1-2 Rust / Cargo 国内镜像
+export RUSTUP_DIST_SERVER="https://mirrors.ustc.edu.cn/rust-static"
+export RUSTUP_UPDATE_ROOT="https://mirrors.ustc.edu.cn/rust-static/rustup"
+export CARGO_REGISTRIES_CRATES_IO_INDEX="https://mirrors.ustc.edu.cn/crates.io-index"
+
+# 1-3 PATH 扩展示例（可自行追加）
+# export PATH="$HOME/.local/bin:$PATH"
+
+# ---------------------------------------------------------
+# 2. x-cmd 加载（仅当文件存在）
+# ---------------------------------------------------------
+# X_CMD="$HOME/.x-cmd.root/X"
+# [[ -f $X_CMD ]] && source "$X_CMD"
+
+# ---------------------------------------------------------
+# 3. 终端行为 & 历史记录
+# ---------------------------------------------------------
+# 忽略重复命令、加大历史记录
+HISTCONTROL=ignoreboth:erasedups
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend              # 多会话实时追加历史
+shopt -s checkwinsize            # 自动更新窗口大小
+
+# ---------------------------------------------------------
+# 4. 彩色与别名
+# ---------------------------------------------------------
+# # 4-1 颜色开关
+# export LS_OPTIONS='--color=auto'
+# [[ -x /usr/bin/dircolors ]] && eval "$(dircolors -b)"
+
+# 4-2 常用别名
+alias ll='ls -alF --color=auto'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias vi='vim'
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# ---------------------------------------------------------
+# 5. 安全别名（防止误操作）
+# ---------------------------------------------------------
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# ---------------------------------------------------------
+# 6. 提示符（PS1）
+# ---------------------------------------------------------
+# 简洁彩色提示符：用户@主机:路径 $
+PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\] \$ '
+
+# ---------------------------------------------------------
+# 7. 杂项
+# ---------------------------------------------------------
+# 7-1 让 less 支持颜色
+export LESS='-R'
+
+# 7-2 让 man 使用彩色高亮
+export LESS_TERMCAP_mb=$'\e[01;31m'
+export LESS_TERMCAP_md=$'\e[01;38;5;74m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[38;5;246m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[04;38;5;146m'
+
+# 7-3 启用 bash-completion（若已安装）
+# [[ -f /usr/share/bash-completion/bash_completion ]] && \
+#     source /usr/share/bash-completion/bash_completion
+
+# =============================================================================
+#  END OF FILE
+# =============================================================================
+# [ ! -f "$HOME/.x-cmd.root/X" ] || . "$HOME/.x-cmd.root/X" # boot up x-cmd.
+
+# 1. 让 ls 带颜色、带大小单位
+alias ll='ls -alFh --color=auto --group-directories-first'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'
+
+# 2. 更友好的 git log
+alias gitlog="git log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all"
+
+# 3. 代理自动切换（示例）
+if ping -c 1 192.168.50.100 &>/dev/null; then
+  export http_proxy=http://192.168.50.100:7890
+  export https_proxy=$http_proxy
+  echo "→ office proxy enabled"
+else
+  unset http_proxy https_proxy
+fi
+
+# 4. 让中文不乱码
+export LANG=zh_CN.UTF-8
+export LESSCHARSET=utf-8
+
+# 5. 历史命令更丰富
+export HISTCONTROL=ignoredups:erasedups
+export HISTSIZE=10000
+shopt -s histappend
+PROMPT_COMMAND='history -a; history -c; history -r'
+
+# 6. 提示符：当前目录 + git 分支
+parse_git_branch() {
+  git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+PS1='\[\e[36m\]\W\[\e[32m\]$(parse_git_branch)\[\e[0m\] $ '
+
+# 7. 自动补全增强
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+  source /usr/share/bash-completion/bash_completion
+fi
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"

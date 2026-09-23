@@ -1,0 +1,20 @@
+# mise 全局配置  chezmoi 管理 → ~/.config/mise/config.toml
+# mise 尊重 XDG_CONFIG_HOME,因此放在 ~/.config/mise 生效。
+# 文档: https://mise.jdx.dev/configuration.html
+
+[settings]
+# 激活目录时自动安装/信任工具
+activate_aggressive = false
+# 静默度:需要更安静可设 true
+quiet = false
+# 任务/工具下载后保留缓存
+always_keep_download = false
+# Windows 上很多运行时已由 scoop/mise 混用,开启 shim 优先避免重复下载
+# 需要固定版本时,取消 [tools] 注释并按需填(会触发下载):
+#
+# [tools]
+# node = "22"
+# python = "3.12"
+# go = "1.23"
+
+[tools]

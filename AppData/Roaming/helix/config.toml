@@ -1,0 +1,55 @@
+# ── 让 Scoop 安装的 hx.exe 能加载主题 ──
+theme = "nord"                           # 主题文件名（去掉 .toml）
+
+# ── 编辑器全局 ──
+[editor]
+line-number = "relative"                 # 相对行号，便于 3j/4k 跳转
+true-color = true                        # 24-bit 真彩色
+color-modes = true                       # 状态栏随模式变色
+cursorline = true                        # 高亮光标所在行
+cursorcolumn = true                      # 高亮光标所在列
+rulers = [80, 120]                       # 垂直标尺
+bufferline = "multiple"                  # 顶部多文件标签
+auto-save = true                         # 退出 Insert 时自动保存
+mouse = true                             # 允许鼠标
+
+# ── 光标形状 ──
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+# ── 状态栏 ──
+[editor.statusline]
+left   = ["mode","spinner"]
+center = ["file-name"]
+right  = ["diagnostics","selections","position","file-encoding","file-line-ending","file-type"]
+separator = "|"
+mode.normal = "😆NOR"
+mode.insert = "🫠INS"
+mode.select = "😅SEL"
+
+# ── 空白字符 ──
+[editor.whitespace]
+render = "all"
+
+# ── 缩进参考线 + Git 沟槽（一次性写全，不重复）──
+[editor.indent-guides]
+render = true
+
+[editor.gutters]
+#gutters = ["diagnostics","line-numbers","diff"]
+
+# ── 按键映射 ──
+[keys.insert]
+#jk = "normal_mode"               # 插入模式连击 jk → 普通模式
+
+[keys.normal.space]
+s = ":w"                         # 空格 s → 保存
+q = ":q!"                        # 空格 q → 强制退出
+w = ":wq"                        # 空格 w → 保存并退出
+r = ":reload"                    # 空格 r → 重载配置
+#t = ":theme "                     # 空格 t → 进入 :theme 选主题
+
+#[editor.command_aliases]
+#t = "theme"

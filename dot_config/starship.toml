@@ -1,0 +1,728 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Starship Prompt · 单文件多主题管理                            ║
+# ║  启用主题: 樱花粉 Sakura Pink                                 ║
+# ║  切换: 注释当前主题全部行, 取消注释目标主题全部行              ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+# ════════════════════════════════════════════════════════════════
+# 【启用】樱花粉 Sakura Pink · 马卡龙甜色系 (修正版)
+# ════════════════════════════════════════════════════════════════
+
+add_newline = false
+format = """
+[░▒▓](#ffb3d1)\
+[ 󰊠 ](bg:#ffb3d1 fg:#1a1a2e)\
+[ ](fg:#ffb3d1 bg:#b3c4ff)\
+$directory\
+[ ](fg:#b3c4ff bg:#ffc8de)\
+$git_branch\
+$git_status\
+[ ](fg:#ffc8de bg:#f2f0f5)\
+$nodejs\
+$rust\
+$golang\
+$php\
+$python\
+[ ](fg:#f2f0f5 bg:#ffb3d1)\
+$os\
+[ ](fg:#ffb3d1 bg:#b3c4ff)\
+$time\
+[ ](fg:#b3c4ff bg:#fcfafd)\
+$cmd_duration\
+[ ](fg:#fcfafd)\
+\n$character"""
+# ---------- 基础样式配置 ----------
+[character]
+success_symbol = "[❯](fg:#ffb3d1)"
+error_symbol = "[❯](fg:#e53170)"
+vimcmd_symbol = "[❮](fg:#b3c4ff)"
+# ---------- 目录组件 ----------
+[directory]
+truncation_length = 3
+truncation_symbol = "…/"
+format = "[ $path ]($style)"
+style = "fg:#1a1a2e bg:#b3c4ff"
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+"Projects" = "󱁻 "
+"Repos" = "󰘬 "
+"Desktop" = " "
+# ---------- Git组件 ----------
+[git_branch]
+symbol = "󰊢"
+style = "bg:#ffc8de"
+format = '[[ $symbol $branch ](fg:#1a1a2e bg:#ffc8de)]($style)'
+[git_status]
+style = "bg:#ffc8de"
+format = '[[($all_status$ahead_behind )](fg:#1a1a2e bg:#ffc8de)]($style)'
+[git_metrics]
+disabled = false
+style = "bg:#ffc8de"
+format = '[[ ±$added-$deleted ](fg:#1a1a2e bg:#ffc8de)]($style)'
+# ---------- 编程语言组件 ----------
+[nodejs]
+symbol = "󰎐"
+style = "bg:#f2f0f5"
+format = '[[ $symbol ($version) ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+[rust]
+symbol = "󱘗"
+style = "bg:#f2f0f5"
+format = '[[ $symbol ($version) ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+[golang]
+symbol = "󰟓"
+style = "bg:#f2f0f5"
+format = '[[ $symbol ($version) ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+[php]
+symbol = "󰌟"
+style = "bg:#f2f0f5"
+format = '[[ $symbol ($version) ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+[python]
+symbol = "󰌠"
+style = "bg:#f2f0f5"
+format = '[[ $symbol ($version) ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+# ---------- 系统信息组件 ----------
+[os]
+disabled = false
+style = "bg:#ffb3d1"
+format = '[[ $symbol ](fg:#1a1a2e bg:#ffb3d1)]($style)'
+[os.symbols]
+Windows = "󰖳"
+Linux = "󰌽"
+Macos = "󰀵"
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#b3c4ff"
+format = '[[ 󰅐 $time ](fg:#1a1a2e bg:#b3c4ff)]($style)'
+# 替换了execution_time为正确的cmd_duration
+[cmd_duration]
+disabled = false
+min_time = 500
+style = "bg:#fcfafd"
+format = '[[ 󱑍 $duration ](fg:#1a1a2e bg:#fcfafd)]($style)'
+# ---------- 额外增强组件 ----------
+[env_var]
+disabled = false
+variable = "VIRTUAL_ENV"
+symbol = "󰀶"
+style = "bg:#ffc8de"
+format = '[[ $symbol ](fg:#1a1a2e bg:#ffc8de)]($style)'
+[battery]
+disabled = false
+full_symbol = "󰁹"
+charging_symbol = "󰂄"
+discharging_symbol = "󰂃"
+style = "bg:#f2f0f5"
+format = '[[ $symbol $percentage ](fg:#1a1a2e bg:#f2f0f5)]($style)'
+    
+
+# ════════════════════════════════════════════════════════════════
+# 【未启用】雪国霓虹 Snow Neon · 低饱和彩虹条
+# ════════════════════════════════════════════════════════════════
+# # ── 雪国霓虹 · 低饱和彩虹条 ─────────────
+# add_newline = false
+# 
+# format = """
+# [░▒▓](fg:#c7b8d8)\
+# [ 󰀵 ](bg:#c7b8d8 fg:#fcfafd)\
+# [ ](fg:#c7b8d8 bg:#d4b8d8)\
+# $directory\
+# [ ](fg:#d4b8d8 bg:#e6c4d8)\
+# $git_branch\
+# $git_status\
+# [ ](fg:#e6c4d8 bg:#b8c7e6)\
+# $nodejs\
+# [ ](fg:#b8c7e6 bg:#b8d4e6)\
+# $rust\
+# [ ](fg:#b8d4e6 bg:#b8e0e6)\
+# $golang\
+# [ ](fg:#b8e0e6 bg:#d8e6d8)\
+# $php\
+# [ ](fg:#d8e6d8 bg:#e6ddd8)\
+# $python\
+# [ ](fg:#e6ddd8 bg:#e6d0d0)\
+# $lua\
+# [ ](fg:#e6d0d0 bg:#f2f0f5)\
+# $time\
+# [ ](fg:#f2f0f5)\
+# \n$character"""
+# 
+# # --------------- 目录 ---------------
+# [directory]
+# truncation_length = 2
+# truncation_symbol = "…/"
+# format = "[ $path ]($style)"
+# style = "fg:#fcfafd bg:#d4b8d8"   # 雪国白字 + 雪夜紫衍生背景
+# 
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = "󰉍 "
+# "Music" = "󰝚 "
+# "Pictures" = "󰉏 "
+# "Code" = "󰘥 "
+# "dotfiles" = "󰘧 "
+# 
+# # --------------- Git ---------------
+# [git_branch]
+# symbol = "󰘬"
+# style = "bg:#e6c4d8"
+# format = '[[ $symbol $branch ](fg:#fcfafd bg:#e6c4d8)]($style)'
+# 
+# [git_status]
+# style = "bg:#e6c4d8"
+# format = '[[($all_status$ahead_behind )](fg:#fcfafd bg:#e6c4d8)]($style)'
+# 
+# # --------------- 语言 / 运行时 ---------------
+# [nodejs]
+# symbol = "󰋘"
+# style = "bg:#b8c7e6"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#b8c7e6)]($style)'
+# 
+# [rust]
+# symbol = "󱘗"
+# style = "bg:#b8d4e6"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#b8d4e6)]($style)'
+# 
+# [golang]
+# symbol = "󰟓"
+# style = "bg:#b8e0e6"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#b8e0e6)]($style)'
+# 
+# [php]
+# symbol = "󰌟"
+# style = "bg:#d8e6d8"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#d8e6d8)]($style)'
+# 
+# [python]
+# symbol = "󰌠"
+# style = "bg:#e6ddd8"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#e6ddd8)]($style)'
+# 
+# [lua]
+# symbol = "󰢱"
+# style = "bg:#e6d0d0"
+# format = '[[ $symbol $version ](fg:#fcfafd bg:#e6d0d0)]($style)'
+# 
+# # --------------- 时间彩蛋 ---------------
+# [time]
+# disabled = false
+# time_format = "%T"
+# style = "bg:#f2f0f5"
+# format = '[[ 󰥔 $time ](fg:#fcfafd bg:#f2f0f5)]($style)'
+# 
+# # --------------- 提示符 ---------------
+# [character]
+# success_symbol = "[❯](bold fg:#ffb3d1)"
+# error_symbol   = "[❯](bold fg:#ffb3d1)"
+
+# ════════════════════════════════════════════════════════════════
+# 【未启用】Gruvbox Dark · 复古暖调
+# ════════════════════════════════════════════════════════════════
+# "$schema" = 'https://starship.rs/config-schema.json'
+# 
+# format = """
+# [](color_orange)\
+# $os\
+# $username\
+# [](bg:color_yellow fg:color_orange)\
+# $directory\
+# [](fg:color_yellow bg:color_aqua)\
+# $git_branch\
+# $git_status\
+# [](fg:color_aqua bg:color_blue)\
+# $c\
+# $cpp\
+# $rust\
+# $golang\
+# $nodejs\
+# $php\
+# $java\
+# $kotlin\
+# $haskell\
+# $python\
+# [](fg:color_blue bg:color_bg3)\
+# $docker_context\
+# $conda\
+# $pixi\
+# [](fg:color_bg3 bg:color_bg1)\
+# $time\
+# [ ](fg:color_bg1)\
+# $line_break$character"""
+# 
+# palette = 'gruvbox_dark'
+# 
+# [palettes.gruvbox_dark]
+# color_fg0 = '#fbf1c7'
+# color_bg1 = '#3c3836'
+# color_bg3 = '#665c54'
+# color_blue = '#458588'
+# color_aqua = '#689d6a'
+# color_green = '#98971a'
+# color_orange = '#d65d0e'
+# color_purple = '#b16286'
+# color_red = '#cc241d'
+# color_yellow = '#d79921'
+# 
+# [os]
+# disabled = false
+# style = "bg:color_orange fg:color_fg0"
+# 
+# [os.symbols]
+# Windows = "󰍲"
+# Ubuntu = "󰕈"
+# SUSE = ""
+# Raspbian = "󰐿"
+# Mint = "󰣭"
+# Macos = "󰀵"
+# Manjaro = ""
+# Linux = "󰌽"
+# Gentoo = "󰣨"
+# Fedora = "󰣛"
+# Alpine = ""
+# Amazon = ""
+# Android = ""
+# Arch = "󰣇"
+# Artix = "󰣇"
+# EndeavourOS = ""
+# CentOS = ""
+# Debian = "󰣚"
+# Redhat = "󱄛"
+# RedHatEnterprise = "󱄛"
+# Pop = ""
+# 
+# [username]
+# show_always = true
+# style_user = "bg:color_orange fg:color_fg0"
+# style_root = "bg:color_orange fg:color_fg0"
+# format = '[ $user ]($style)'
+# 
+# [directory]
+# style = "fg:color_fg0 bg:color_yellow"
+# format = "[ $path ]($style)"
+# truncation_length = 3
+# truncation_symbol = "…/"
+# 
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = "󰝚 "
+# "Pictures" = " "
+# "Developer" = "󰲋 "
+# 
+# [git_branch]
+# symbol = ""
+# style = "bg:color_aqua"
+# format = '[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)'
+# 
+# [git_status]
+# style = "bg:color_aqua"
+# format = '[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)'
+# 
+# [nodejs]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [c]
+# symbol = " "
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [cpp]
+# symbol = " "
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [rust]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [golang]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [php]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [java]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [kotlin]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [haskell]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [python]
+# symbol = ""
+# style = "bg:color_blue"
+# format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+# 
+# [docker_context]
+# symbol = ""
+# style = "bg:color_bg3"
+# format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+# 
+# [conda]
+# style = "bg:color_bg3"
+# format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
+# 
+# [pixi]
+# style = "bg:color_bg3"
+# format = '[[ $symbol( $version)( $environment) ](fg:color_fg0 bg:color_bg3)]($style)'
+# 
+# [time]
+# disabled = false
+# time_format = "%R"
+# style = "bg:color_bg1"
+# format = '[[  $time ](fg:color_fg0 bg:color_bg1)]($style)'
+# 
+# [line_break]
+# disabled = false
+# 
+# [character]
+# disabled = false
+# success_symbol = '[](bold fg:color_green)'
+# error_symbol = '[](bold fg:color_red)'
+# vimcmd_symbol = '[](bold fg:color_green)'
+# vimcmd_replace_one_symbol = '[](bold fg:color_purple)'
+# vimcmd_replace_symbol = '[](bold fg:color_purple)'
+# vimcmd_visual_symbol = '[](bold fg:color_yellow)'
+
+# ════════════════════════════════════════════════════════════════
+# 【未启用】紫色模板 Purple · 旧参考版
+# ════════════════════════════════════════════════════════════════
+# format = """
+# [](#9A348E)\
+# $os\
+# $username\
+# [](bg:#DA627D fg:#9A348E)\
+# $directory\
+# [](fg:#DA627D bg:#FCA17D)\
+# $git_branch\
+# $git_status\
+# [](fg:#FCA17D bg:#86BBD8)\
+# $c\
+# $elixir\
+# $elm\
+# $golang\
+# $gradle\
+# $haskell\
+# $java\
+# $julia\
+# $nodejs\
+# $nim\
+# $rust\
+# $scala\
+# [](fg:#86BBD8 bg:#06969A)\
+# $docker_context\
+# [](fg:#06969A bg:#33658A)\
+# $time\
+# [ ](fg:#33658A)\
+# """
+# 
+# # Disable the blank line at the start of the prompt
+# # add_newline = false
+# 
+# # You can also replace your username with a neat symbol like   or disable this
+# # and use the os module below
+# [username]
+# show_always = true
+# style_user = "bg:#9A348E"
+# style_root = "bg:#9A348E"
+# format = '[$user ]($style)'
+# disabled = false
+# 
+# # An alternative to the username module which displays a symbol that
+# # represents the current operating system
+# [os]
+# style = "bg:#9A348E"
+# disabled = true # Disabled by default
+# 
+# [directory]
+# style = "bg:#DA627D"
+# format = "[ $path ]($style)"
+# truncation_length = 3
+# truncation_symbol = "…/"
+# 
+# # Here is how you can shorten some long paths by text replacement
+# # similar to mapped_locations in Oh My Posh:
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = " "
+# "Pictures" = " "
+# # Keep in mind that the order matters. For example:
+# # "Important Documents" = " 󰈙 "
+# # will not be replaced, because "Documents" was already substituted before.
+# # So either put "Important Documents" before "Documents" or use the substituted version:
+# # "Important 󰈙 " = " 󰈙 "
+# 
+# [c]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [cpp]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [docker_context]
+# symbol = " "
+# style = "bg:#06969A"
+# format = '[ $symbol $context ]($style)'
+# 
+# [elixir]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [elm]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [git_branch]
+# symbol = ""
+# style = "bg:#FCA17D"
+# format = '[ $symbol $branch ]($style)'
+# 
+# [git_status]
+# style = "bg:#FCA17D"
+# format = '[$all_status$ahead_behind ]($style)'
+# 
+# [golang]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [gradle]
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [haskell]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [java]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [julia]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [nodejs]
+# symbol = ""
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [nim]
+# symbol = "󰆥 "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [rust]
+# symbol = ""
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [scala]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ($version) ]($style)'
+# 
+# [time]
+# disabled = false
+# time_format = "%R" # Hour:Minute Format
+# style = "bg:#33658A"
+# format = '[ ♥ $time ]($style)'
+
+# ════════════════════════════════════════════════════════════════
+# 【未启用】Catppuccin Mocha · 奶咖毛玻璃
+# ════════════════════════════════════════════════════════════════
+# # ── Mac 毛玻璃 · 奶咖配色 ─────────────────────────
+# add_newline = false                      # 去掉提示符前空行
+# # --- 手动 Catppuccin Mocha 色值 ---
+# [colors]
+# rosewater = "#f5e0dc"
+# flamingo  = "#f2cdcd"
+# pink      = "#f5c2e7"
+# mauve     = "#cba6f7"
+# red       = "#f38ba8"
+# maroon    = "#eba0ac"
+# peach     = "#fab387"
+# yellow    = "#f9e2af"
+# green     = "#a6e3a1"
+# teal      = "#94e2d5"
+# sky       = "#89dceb"
+# sapphire  = "#74c7ec"
+# blue      = "#89b4fa"
+# lavender  = "#b4befe"
+# text      = "#cdd6f4"
+# subtext1  = "#bac2de"
+# subtext0  = "#a6adc8"
+# overlay2  = "#9399b2"
+# overlay1  = "#7f849c"
+# overlay0  = "#6c7086"
+# surface2  = "#585b70"
+# surface1  = "#45475a"
+# surface0  = "#313244"
+# base      = "#1e1e2e"
+# mantle    = "#181825"
+# crust     = "#11111b"
+# 
+# format = """
+# [░▒▓](#89b4fa)\
+# [ 󰊠 ](bg:#89b4fa fg:#11111b)\
+# [ ](fg:#89b4fa bg:#74c7ec)\
+# $directory\
+# [ ](fg:#74c7ec bg:#94e2d5)\
+# $git_branch\
+# $git_status\
+# [ ](fg:#94e2d5 bg:#a6e3a1)\
+# $nodejs\
+# $rust\
+# $golang\
+# $php\
+# [ ](fg:#a6e3a1 bg:#fab387)\
+# $time\
+# [ ](fg:#fab387)\
+# \n$character"""
+# 
+# # 路径段
+# [directory]
+# truncation_length = 3
+# truncation_symbol = "…/"
+# format = "[ $path ]($style)"
+# style = "fg:#cdd6f4 bg:#74c7ec"
+# 
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = " "
+# "Pictures" = " "
+# 
+# # Git 段
+# [git_branch]
+# symbol = "󰘬"
+# style = "bg:#94e2d5"
+# format = '[[ $symbol $branch ](fg:#11111b bg:#94e2d5)]($style)'
+# 
+# [git_status]
+# style = "bg:#94e2d5"
+# format = '[[($all_status$ahead_behind )](fg:#11111b bg:#94e2d5)]($style)'
+# 
+# # 语言段（Node、Rust、Go、PHP）
+# [nodejs]
+# symbol = "󰎐"
+# style = "bg:#a6e3a1"
+# format = '[[ $symbol ($version) ](fg:#11111b bg:#a6e3a1)]($style)'
+# 
+# [rust]
+# symbol = "󱘗"
+# style = "bg:#a6e3a1"
+# format = '[[ $symbol ($version) ](fg:#11111b bg:#a6e3a1)]($style)'
+# 
+# [golang]
+# symbol = "󰟓"
+# style = "bg:#a6e3a1"
+# format = '[[ $symbol ($version) ](fg:#11111b bg:#a6e3a1)]($style)'
+# 
+# [php]
+# symbol = "󰌟"
+# style = "bg:#a6e3a1"
+# format = '[[ $symbol ($version) ](fg:#11111b bg:#a6e3a1)]($style)'
+# 
+# # 时间
+# [time]
+# disabled = false
+# time_format = "%R"
+# style = "bg:#fab387"
+# format = '[[ 󰅐 $time ](fg:#11111b bg:#fab387)]($style)'
+
+# ════════════════════════════════════════════════════════════════
+# 【未启用】深蓝冷色 Deep Blue Cool
+# ════════════════════════════════════════════════════════════════
+# add_newline = false
+# format = """
+# [░▒▓](#a3aed2)\
+# [  ](bg:#a3aed2 fg:#090c0c)\
+# [](bg:#769ff0 fg:#a3aed2)\
+# $directory\
+# [](fg:#769ff0 bg:#394260)\
+# $git_branch\
+# $git_status\
+# [](fg:#394260 bg:#212736)\
+# $nodejs\
+# $rust\
+# $golang\
+# $php\
+# [](fg:#212736 bg:#1d2230)\
+# $time\
+# [ ](fg:#1d2230)\
+# \n$character"""
+# 
+# [directory]
+# style = "fg:#e3e5e5 bg:#769ff0"
+# format = "[ $path ]($style)"
+# truncation_length = 3
+# truncation_symbol = "…/"
+# 
+# [directory.substitutions]
+# "Documents" = "󰈙 "
+# "Downloads" = " "
+# "Music" = " "
+# "Pictures" = " "
+# 
+# [git_branch]
+# symbol = ""
+# style = "bg:#394260"
+# format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
+# 
+# [git_status]
+# style = "bg:#394260"
+# format = '[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)'
+# 
+# [nodejs]
+# symbol = ""
+# style = "bg:#212736"
+# format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+# 
+# [rust]
+# symbol = ""
+# style = "bg:#212736"
+# format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+# 
+# [golang]
+# symbol = ""
+# style = "bg:#212736"
+# format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+# 
+# [php]
+# symbol = ""
+# style = "bg:#212736"
+# format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+# 
+# [time]
+# disabled = false
+# time_format = "%R" # Hour:Minute Format
+# style = "bg:#1d2230"
+# format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'

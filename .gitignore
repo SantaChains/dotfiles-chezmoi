@@ -1,0 +1,36 @@
+# 仓库级忽略(chezmoi 源本身是个 git 仓库)
+
+# chezmoi 状态数据库:绝不该被提交
+.chezmoistate.boltdb
+*.boltdb
+
+# 运行时状态/临时文件,非配置
+dot_viminfo
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 编辑器缓冲区/状态(非配置)
+dot_config/micro/buffers/
+**/buffers/
+
+# lite-xl 运行时会话状态
+dot_config/lite-xl/session.lua
+dot_config/lite-xl/ws/
+
+# registry 凭据类文件,永不外传
+**/auth.ini
+
+# 密钥/token 文件,绝不入库
+**/gh/hosts.yml
+**/hosts.yml
+**/.netrc
+**/credentials
+
+# 生成型缓存
+**/clangd/index/
+**/clangd/.history/
+
+# 本地临时
+*.tmp

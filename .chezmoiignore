@@ -1,0 +1,45 @@
+# chezmoi 忽略规则：这些源条目不会被应用到目标,也不会被 chezmoi 管理。
+# 匹配的是源目录(本仓库)内的路径。
+
+# chezmoi 自身状态数据库(本就该在目标端 ~/.config/chezmoi,绝不该进源/仓库)
+chezmoistate.boltdb
+**/*.boltdb
+dot_config/chezmoi/chezmoistate.boltdb
+
+# 仓库内部文档/备忘:仅存在于源仓库,不下发到 home
+chezmoi.md
+AGENTS.md
+
+# 运行时状态类“伪配置”,不要当 dotfile 管理(会覆盖真实历史)
+dot_viminfo
+**/*.swp
+**/.DS_Store
+
+# 编辑器缓冲区/状态(非配置)
+dot_config/micro/buffers
+**/buffers
+
+# lite-xl 运行时会话状态(每次启动会变,不管理)
+dot_config/lite-xl/session.lua
+dot_config/lite-xl/ws
+
+# registry 凭据类文件,不被 chezmoi 下发
+dot_config/pnpm/auth.ini
+**/auth.ini
+
+*.log
+*.db
+
+# 密钥/token 文件:绝不下发、绝不入库
+**/gh/hosts.yml
+dot_config/gh/hosts.yml
+**/.netrc
+**/credentials
+**/id_rsa
+**/id_ed25519
+
+# 生成型缓存(即使被误收也不下发)
+AppData/Local/clangd/index
+AppData/Local/clangd/.history
+**/clangd/index
+

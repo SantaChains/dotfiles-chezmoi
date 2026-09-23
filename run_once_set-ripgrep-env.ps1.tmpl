@@ -1,0 +1,10 @@
+# chezmoi run_once 脚本:仅在用户环境变量尚未设置时,写入 RIPGREP_CONFIG_PATH。
+# 目标:`~/.config/ripgrep/ripgreprc`(由 chezmoi 下发)。
+# run_once_ 前缀 → 每个目标机器只在状态变化时执行一次。
+
+$target = '{{ .chezmoi.homeDir }}/.config/ripgrep/ripgreprc'
+$current = [Environment]::GetEnvironmentVariable('RIPGREP_CONFIG_PATH', 'User')
+if ($current -ne $target) {
+    [Environment]::SetEnvironmentVariable('RIPGREP_CONFIG_PATH', $target, 'User')
+    Write-Host "已设置 RIPGREP_CONFIG_PATH = $target (新开终端后生效)"
+}

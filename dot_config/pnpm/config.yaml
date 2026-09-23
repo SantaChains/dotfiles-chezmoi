@@ -1,0 +1,8 @@
+cacheDir: D:\pnpm-cache
+fetchRetries: 5
+fetchTimeout: 120000
+httpsProxy: http://127.0.0.1:6857
+minimumReleaseAge: 0
+networkConcurrency: 8
+proxy: http://127.0.0.1:6857
+storeDir: D:\pnpm-store
