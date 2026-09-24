@@ -1,0 +1,93 @@
+# ============================================================
+# cargo 全局配置(~/.cargo/config.toml) — Windows x86_64, nightly 为主工具链
+# 依据: cargo 1.100 nightly unstable 文档 + Rust 1.94~1.98 (2026) 发行注记
+# 核对日期: 2026-09
+# ============================================================
+
+[http]
+# 空字符串 = 强制直连(不吃 HTTP(S)_PROXY 环境变量); git 操作走 git-fetch-with-cli,
+# 由 git 自身配置代理。删掉此行则恢复环境变量代理行为。
+proxy = ""
+
+[net]
+# git 依赖用外部 git 命令拉取, 复用 ~/.gitconfig 的认证与代理
+git-fetch-with-cli = true
+
+[registries.crates-io]
+# sparse 索引自 cargo 1.70 起为默认, 此行仅作显式声明
+protocol = "sparse"
+
+# ============================================================
+# nightly 旗标([unstable] 仅在 nightly 工具链下生效, stable 会忽略或报错)
+# 官方清单: https://doc.rust-lang.org/nightly/cargo/reference/unstable.html
+# 注意: 值必须是布尔, 写成 "true"/"no" 字符串会报
+#       "expected true/false, but found a string" 并令所有 cargo 命令失败
+# ============================================================
+[unstable]
+
+# 元数据不重复嵌入 rlib/dylib, target 目录节省 5%-30%(磁盘优化)
+embed-metadata = false
+
+# 全局缓存垃圾回收, 自动清理未使用的编译产物
+gc = true
+
+# 使用时更新依赖文件 mtime, 供 cargo-sweep 等工具识别过时产物
+mtime-on-use = true
+
+# 构建不需要时不下载 dev-dependencies, 省网络与 IO
+avoid-dev-deps = true
+
+# 依赖可标记 public/private, 配合 exported_private_dependencies lint
+public-dependency = true
+
+# 细粒度文件锁, 降低并发构建的锁竞争
+fine-grain-locking = true
+
+# gitoxide 替代 git2 执行部分 git 操作, 更快
+gitoxide = true
+
+# --- 已核实仍为 nightly, 按需开启 ---
+# checksum-freshness = true   # 用校验和而非 mtime 判断重建, 跨机器复制目录更可靠, 每次构建增加哈希开销
+# rustc-unicode = true        # cargo 错误信息启用 rustc 的 unicode 错误格式
+
+# ============================================================
+# 构建(rustc 侧)
+# ============================================================
+[build]
+rustflags = [
+  # 针对本机 CPU 生成指令(AVX2/BMI/FMA 等), 本机运行显著提速
+  # 产物不可移植到旧 CPU; 需要分发时删除此项
+  "-C",
+  "target-cpu=native",
+  # 并行前端(仅 nightly): 解析/类型检查/借用检查多线程, 大项目首编提速明显
+  # 截至 1.98(2026-08)仍未稳定化; 0 = 按核数自动
+  # "-Z", "threads=0",
+]
+
+# 1.97+ 稳定的构建警告级别: "warn"(默认) / "deny"(CI) / "allow"
+# warnings = "deny"
+
+[profile.dev]
+# 行级调试信息替代完整 debuginfo: target 目录大幅缩小, 断点/回溯仍可用,
+# 仅损失部分变量级调试细节。需要完整调试时改回 2
+debug = 1
+
+[profile.release]
+# ThinLTO 跨 crate 优化, 运行时性能与体积的均衡点(比 fat LTO 编译快得多)
+lto = "thin"
+# 单 codegen unit 配合 LTO 达到最佳优化, 牺牲编译并行度(release 场景值得)
+codegen-units = 1
+# 产物剥离符号表, 体积显著缩小; 需要符号排查时临时 cargo build --profile release 再改回
+strip = "symbols"
+
+# ============================================================
+# 目标特定: x86_64-pc-windows-msvc
+# ============================================================
+[target.x86_64-pc-windows-msvc]
+# rust-lld 链接器(随工具链自带, 无需安装)。截至 1.98 MSVC 目标默认仍是 link.exe
+# (1.90 的 LLD 默认化只发生在 x86_64-unknown-linux-gnu), 社区实测干净构建链接提速 ~15%,
+# Bevy 官方快速构建配置同款。遇链接问题删除此行即回退 link.exe
+linker = "rust-lld.exe"
+
+# 注: 此处不放 rustflags —— 实测(2026-09 cargo 1.100 nightly)空数组也按"已设置"处理,
+#     会静默覆盖 build.rustflags, 导致 target-cpu=native 丢失
