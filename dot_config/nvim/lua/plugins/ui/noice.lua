@@ -24,15 +24,18 @@ require("noice").setup({
 		enabled = true,
 		view = "notify",
 	},
-	hover = {
-		enabled = false,
-	},
 	lsp = {
+		-- noice 接管 LSP UI(消除 checkhealth 四条 WARNING):
+		-- hover/signature 走 noice 弹窗,markdown 渲染经 noice 处理
+		override = {
+			["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+			["vim.lsp.util.stylize_markdown"] = true,
+		},
 		hover = {
-			enabled = false,
+			enabled = true,
 		},
 		signature = {
-			enabled = false,
+			enabled = true,
 		},
 	},
 	presets = {

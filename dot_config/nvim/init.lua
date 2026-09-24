@@ -1,6 +1,13 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
+-- 远程插件提供者(rplugins):本配置没有 Node/Python/Perl/Ruby 写的远程插件,全部关闭
+-- 消除 checkhealth 的 4 条 provider 警告。外部 LSP/工具(pyright 等)不受影响。
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- Scrolloff
 local scrolloff = math.floor(vim.o.lines / 2) - 3
 vim.opt.scrolloff = scrolloff

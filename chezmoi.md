@@ -31,3 +31,20 @@ chezmoi doctor                 # 体检（看 suspicious-entries / 路径）
 ## 安全
 - 绝不提交密钥：`gh/hosts.yml`、`**/auth.ini`、`*.token`、`*_KEY/*`、`*password*` 已在 `.chezmoiignore`/`.gitignore` 排除。
 - 一旦某个 key 泄露到公开仓库：**先去服务端吊销/轮换**，再重写历史 + 强推；只清 git 历史救不回已公开的密钥。
+
+
+
+--- 
+## 等待添加
+fish
+temux
+zellij
+ghostty
+katty
+
+
+---
+## 独立配置不收编
+wezterm
+nushell
+nvim:lazyvim Astronvim nvchal
