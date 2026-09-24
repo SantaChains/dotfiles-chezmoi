@@ -1,0 +1,13 @@
+[wsl2]
+firewall=false
+networkingMode=Mirrored
+autoProxy=true
+defaultVhdSize=50GB
+memory=8GB
+swap=2GB
+processors=8
+localhostForwarding=true
+
+[experimental]
+autoMemoryReclaim=gradual
+sparseVhd=true
