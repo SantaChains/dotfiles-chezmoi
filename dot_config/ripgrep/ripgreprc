@@ -12,6 +12,7 @@
 
 # 全局忽略(仍会先遵循各仓库的 .gitignore)
 --glob=!node_modules/
+--glob=!.history/
 --glob=!.git/
 --glob=!.venv/
 --glob=!dist/
@@ -23,6 +24,6 @@
 --glob=!pnpm-lock.yaml
 --glob=!**/*.lock
 
-# 显示行号、以文件分组、二进制自动跳过(默认已开)
+# 显示行号、以文件分组(--heading,rg 无 --group 旗标)、二进制自动跳过(默认已开)
 --line-number
---group
+--heading

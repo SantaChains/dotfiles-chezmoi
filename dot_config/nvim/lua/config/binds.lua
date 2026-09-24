@@ -24,6 +24,7 @@ for _, bind in ipairs({ "i", "a", "A", "I" }) do
 end
 
 Keymap("i", "<C-BS>", "<C-W>") -- C-Backscpace for whole words
+Keymap("i", "jk", "<Esc>") -- exit insert mode
 
 Keymap("n", "<leader>d", "<cmd>lua vim.diagnostic.open_float()<CR>") -- Diagnostics for Linter
 Keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>") -- Diagnostics for Linter

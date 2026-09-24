@@ -17,12 +17,12 @@ require("lualine").setup({
 		ignore_focus = {},
 		always_divide_middle = true,
 		always_show_tabline = true,
-		globalstatus = false,
+		globalstatus = true, -- perf: single statusline instead of per-window
 		refresh = {
 			statusline = 1000,
 			tabline = 1000,
 			winbar = 1000,
-			refresh_time = 16, -- ~60fps
+			refresh_time = 100, -- perf: was 16 (~60fps)
 			events = {
 				"WinEnter",
 				"BufEnter",
@@ -31,8 +31,8 @@ require("lualine").setup({
 				"FileChangedShellPost",
 				"VimResized",
 				"Filetype",
-				"CursorMoved",
-				"CursorMovedI",
+				-- "CursorMoved", -- perf: disabled per-cursor-move statusline redraw
+				-- "CursorMovedI", -- perf: disabled per-cursor-move statusline redraw
 				"ModeChanged",
 			},
 		},

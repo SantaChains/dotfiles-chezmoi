@@ -1,0 +1,35 @@
+# kakrc — chezmoi 管理
+# 理念: 按照kakoune 的社区推荐键位,更符合人体工程学,减少和弦的配置.
+# 人体工学重映射由 autoload/eak.kak 提供（Eak/Easy Kakoune, François Tonneau），
+# autoload/ 下文件启动时自动加载，无需显式 source。
+# eak 核心键位（选区即语言，动词在后）：
+#   z/x/e = 选区首/中/尾, - = 分组, q = 取消主选区, ' = 宏
+#   h/j/k/l/w/b = 选区式移动, t = 找字符, m = 括号配对, <a-q>/<a-r> = 轮换
+# 完整键位表见 eak.kak 内 eak-map 段。
+
+# ── 显示 ─────────────────────────────────────────────────────
+set global scrolloff 5,5
+add-highlighter global/ number-lines -hlcursor
+add-highlighter global/ show-matching
+add-highlighter global/ wrap -word -indent
+
+# ── 缩进 ──
+set global tabstop 4
+set global indentwidth 4
+
+# ── 移动时提示上下文 ──
+hook global WinDisplay .* info -anchor cursor
+
+# ── App 用户模式 ──
+# 空格单击进入，单键替代 :w / :q 冒号命令，延续 eak 少和弦思路。
+# （eak 已占用 , 与 q，故前缀用空格；normal 模式空格无默认绑定，零冲突）
+declare-user-mode app
+map global normal <space> ':enter-user-mode app<ret>'
+map global app w ':write<ret>'                   -docstring 'save'
+map global app q ':quit<ret>'                    -docstring 'quit'
+map global app x ':write-all<ret>:quit-all<ret>' -docstring 'save+quit all'
+map global app n ':buffer-next<ret>'             -docstring 'next buffer'
+map global app p ':buffer-prev<ret>'             -docstring 'prev buffer'
+map global app b ':buffer<space>'                -docstring 'pick buffer'
+map global app f ':edit<space>'                  -docstring 'open file'
+map global app r ':config-reload<ret>'           -docstring 'reload config'

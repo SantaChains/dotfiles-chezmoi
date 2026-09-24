@@ -20,7 +20,7 @@ vim.lsp.config("lua_ls", {
 })
 
 vim.lsp.config("rust_analyzer", {
-	cmd = { "rustup", "run", "stable", "rust-analyzer" },
+	cmd = { "LspProxy", "--", "rust-analyzer" },
 })
 
 vim.lsp.config("gopls", {
@@ -72,8 +72,6 @@ vim.lsp.enable({
 	"ltex",
 	"emmet_language_server",
 })
-
-vim.o.winborder = "rounded"
 
 require("blink.cmp").build():pwait()
 

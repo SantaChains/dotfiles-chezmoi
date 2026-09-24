@@ -4,11 +4,13 @@ vim.pack.add({
 	{ src = "https://github.com/rcarriga/nvim-notify", name = "notify" },
 })
 
-vim.notify = require("notify").setup({
+-- notify.setup returns its config table, not a callable; assign the module itself
+require("notify").setup({
 	background_colour = "#000000",
 	render = "compact",
 	stages = "slide",
 })
+vim.notify = require("notify")
 require("noice").setup({
 	messages = {
 		enabled = true,

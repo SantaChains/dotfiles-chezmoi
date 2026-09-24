@@ -10,9 +10,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
 		-- Perform an async fetch to avoid startup lag
 		vim.fn.jobstart("git fetch", {
 			on_exit = function()
-				-- Get the number of commits the remote is ahead of local HEAD
-				local count = vim.fn.system("git rev-list --count HEAD..@{u}"):gsub("%s+", "")
-				if count ~= "" and tonumber(count) > 0 then
+				-- Extract digits only: rev-list fails (no upstream) and prints a fatal message
+				local count = tonumber(vim.fn.system("git rev-list --count HEAD..@{u}"):match("%d+"))
+				if count and count > 0 then
 					vim.schedule(function()
 						vim.notify(
 							"󰊢 " .. count .. " new commit(s) available on remote.",
