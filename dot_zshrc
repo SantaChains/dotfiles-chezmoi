@@ -1,4 +1,145 @@
-# OpenClaw Completion
-source "C:\Users\Jliu Pureey\.openclaw\completions\openclaw.zsh"
+# ─────────────────────────────────────────────────────────────
+#  ~/.zshrc   (Arch Linux on WSL2 + Oh My Zsh)
+#  详细系统说明见 D:/Linux/ARCH-WSL2-使用手册.md
+#  旧配置备份: ~/.zshrc.bak-*
+#  本文件同时用于 Windows 侧 zsh（chezmoi 管理），工具相关部分都有守卫。
+# ─────────────────────────────────────────────────────────────
 
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+# ── Windows 侧（OpenClaw / Kiro）集成：仅 Windows 的 zsh 加载 ──
+case "$(uname -s 2>/dev/null)" in
+  MINGW*|MSYS*|CYGWIN*)
+    [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+    [ "$TERM_PROGRAM" = "kiro" ] && . "$(kiro --locate-shell-integration-path zsh)" 2>/dev/null
+    ;;
+esac
+
+# ── PATH：用户级命令目录 + 剔除 /mnt/* ─────────────────────────
+# /mnt/* 是 appendWindowsPath 带进来的 Windows 目录；命令找不到时
+# WSL 要逐个试探它们（9P/interop），实测每次 ~650ms（20 次 13s）。
+# 要调 Windows 程序请写绝对路径，如 /mnt/c/Windows/explorer.exe
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.config/emacs/bin:$PATH"
+path=(${path:#/mnt/*})
+
+# ── 历史 ──────────────────────────────────────────────────────
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS SHARE_HISTORY \
+       INC_APPEND_HISTORY EXTENDED_HISTORY
+
+# ── 环境变量 ──────────────────────────────────────────────────
+export EDITOR=nvim
+export VISUAL=nvim
+export PAGER=less
+export MANPAGER='less -R'
+
+# ── fzf（官方 zsh 集成：Ctrl-R 历史 / Ctrl-T 文件 / Alt-C 跳目录）──
+# 用 fd 作为来源：自带、快、尊重 .gitignore；排除常见大目录。
+# [[ -t 0 ]]：仅在有终端时加载，避免 zsh -i -c（无 tty）下 zle 报错。
+if command -v fzf >/dev/null 2>&1 && [[ -t 0 ]]; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude .venv --exclude target'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_CTRL_T_OPTS='--preview "bat -n --color=always --line-range :200 {}"'
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude .venv --exclude target'
+  export FZF_ALT_C_OPTS='--preview "lsd --tree --depth 2 --color always {} 2>/dev/null || ls -la {}"'
+  source <(fzf --zsh)
+fi
+
+# ── zoxide（智能 cd：z <关键词> 跳常用目录，zi 配合 fzf 交互）──
+command -v zoxide >/dev/null 2>&1 && [[ -t 0 ]] && eval "$(zoxide init zsh)"
+
+# ── zsh-completions 包已装在 /usr/share/zsh/site-functions（默认 fpath）──
+
+# ═══════════════════════ Oh My Zsh ═══════════════════════════
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+
+# 不自动检查/安装 OMZ 更新（要升级手动跑 `omz update`），避免偶发卡顿与提示
+zstyle ':omz:update' mode disabled
+
+# 只启用确实会用到的插件，避免拖慢启动
+plugins=(
+  git              # g/ga/gco/gd/gp/gst... 一大票 git 别名 + prompt 分支信息
+  sudo             # 连按两次 ESC → 在命令前加 sudo
+  extract          # x <压缩包> 一键解压
+  colored-man-pages
+)
+
+# Oh My Zsh 可选：Windows 侧未装时退回内置补全，保证同一个 .zshrc 跨平台可用
+if [ -f "$ZSH/oh-my-zsh.sh" ]; then
+  source "$ZSH/oh-my-zsh.sh"
+else
+  autoload -Uz compinit && compinit -C
+  zstyle ':completion:*' menu select
+  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+fi
+
+# ── 别名：ls 系列走 eza（真 ls 用 \ls）────────────────────────
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -la --icons --git --group-directories-first'
+  alias la='eza -a --icons'
+  alias lt='eza --tree --level=2 --icons'
+fi
+
+# ── 别名：git（覆盖 omz git 插件里与旧习惯不同的几条）─────────
+# omz 的 gl=git pull / gc=git commit -v，这里恢复原有习惯
+alias gs='git status -sb'
+alias gl='git log --oneline --graph --decorate -20'
+alias gc='git commit -m'
+alias gd='git diff'
+alias gp='git push'
+
+# ── 其它别名（对齐 fish 的 abbr）──────────────────────────────
+alias k='kak'
+alias py='python3'
+alias cr='cargo'
+alias pSyu='sudo pacman -Syu'
+alias pSs='pacman -Ss'
+alias pQ='pacman -Q'
+alias pS='sudo pacman -S'
+alias pRns='sudo pacman -Rns'
+
+# ── 交互增强（常见 zsh 人体工学设置）──────────────────────────
+setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS NO_BEEP   # 打目录名即 cd、目录栈、关蜂鸣
+KEYTIMEOUT=1                                          # Esc 更快生效（vi 模式/序列）
+alias ..='cd ..'
+alias ...='cd ../..'
+alias -- -='cd -'
+mkcd() { mkdir -p "$1" && cd "$1"; }                  # mkcd 新建并进入
+# Ctrl/Alt + 左右按词移动（终端常见序列都绑上）
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;3C' forward-word
+bindkey '^[[1;3D' backward-word
+# Ctrl+Backspace / Ctrl+W 删词（^H 兼容部分终端）
+bindkey '^H' backward-kill-word
+
+# ── Node：nvm 惰性加载（直接 source 会拖慢 ~0.3s）──────────────
+# node/npm 平时通过 ~/.local/bin 的软链（指向 nvm 默认版本）可用，
+# 只有真正调用 nvm 命令时才加载它。
+export NVM_DIR="$HOME/.nvm"
+nvm() {
+  unfunction nvm 2>/dev/null
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
+
+# ── Doom Emacs 便捷命令：dm ───────────────────────────────────
+[ -f "$HOME/.config/shell/doom.sh" ] && source "$HOME/.config/shell/doom.sh"
+
+# ── 插件（必须最后 source 语法高亮）──────────────────────────
+# 自动建议：灰字补全历史命令
+if [ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+  ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=40
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+# 语法高亮：必须是最后一个被 source 的插件
+if [ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+  ZSH_HIGHLIGHT_PATTERNS+=('rm -rf *' 'fg=white,bold,bg=red')
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi

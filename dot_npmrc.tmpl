@@ -1,0 +1,15 @@
+{{ if eq .chezmoi.os "windows" }}registry=https://registry.npmmirror.com
+prefix=D:\npm-global
+cache=D:\npm-cache
+allow-scripts=@alibaba-group/open-code-review,@dashscope-js/claude-code-config,@deepseek-ai/dsh,@earendil-works/pi-coding-agent,@nubjs/nub,@t1ckbase/vscode-langservers-extracted,eslint,fanyi,fkill-cli,fskill,js-beautify,mcporter,morphicons,ncm-studio-cli,npm-check-updates,npm,opencode-ai,opencode-extension-manager,opencode-marketplace,oxfmt,oxlint,pnpm,prettier
+@scarf:registry=https://0.0.0.0/
+@segment:registry=https://0.0.0.0/
+@amplitude:registry=https://0.0.0.0/
+audit=false
+fund=false
+update-notifier=false
+allow-git=root
+allow-remote=root
+{{ else }}registry=https://registry.npmmirror.com
+fetch-timeout=120000
+{{ end }}

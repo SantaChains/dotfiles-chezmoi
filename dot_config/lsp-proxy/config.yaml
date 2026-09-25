@@ -1,0 +1,16 @@
+translate:
+  engine: google          # google | openai（openai 兼容端点：DeepSeek / Ollama 也走这个）
+  openai:
+    base_url: https://api.deepseek.com/v1
+    api_key: ""           # ← 想用 DeepSeek 就填 key，并把上面 engine 改成 openai
+    model: deepseek-chat
+
+proxy:
+  target_lang: zh-CN
+  cache_size: 30
+  dict_file: ~/.local/share/lsp-proxy/dict.json
+  translation_timeout: 3000   # 默认 600ms 太短：墙内/代理下常超时（日志里可见）
+
+log:
+  level: info
+  file: ~/.local/share/lsp-proxy/proxy.log

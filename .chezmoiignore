@@ -47,3 +47,44 @@ AppData/Local/clangd/.history
 dot_config/nvim/nvim-pack-lock.json
 **/nvim-pack-lock.json
 
+
+# 本地备份文件（*.bak-*）不进源/仓库
+**/*.bak-*
+
+# ─────────────────────────────────────────────────────────────
+# OS 分支（2026-09-25）：同一仓库供 Windows + WSL 使用
+# .chezmoi.os 取值：windows / linux / darwin
+# ─────────────────────────────────────────────────────────────
+# Windows 专属 → 在 Linux(WSL) 上忽略（不影响 Windows 行为）
+{{- if eq .chezmoi.os "linux" }}
+AppData
+.glzr
+.wslconfig
+.emacs.d
+.cargo
+.config/lite-xl
+.config/pragtical
+.config/whkdrc
+.config/lsd
+.config/nvim
+.bunrc
+Mercurial.ini
+banner
+set-ripgrep-env.ps1
+{{- end }}
+
+# Linux/WSL 专属 → 在非 Linux 上忽略（不影响 Windows 现有受管项）
+{{- if ne .chezmoi.os "linux" }}
+.config/doom
+.config/pip
+.config/lsp-proxy
+.config/shell
+.bash_profile
+.shinit
+.bunfig.toml
+.pi
+.agents
+{{- end }}
+
+# 密钥（pi 凭据），全局忽略
+**/auth.json

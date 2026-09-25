@@ -1,6 +1,24 @@
 # Eak / Easy Kakoune
 # A set of remappings for the Kakoune editor. Requires Kakoune >= 2022.10.31.
 # Author: François Tonneau
+#
+# ---------------------------------------------------------------------------
+# 社区对齐与取舍（2026-09-25，本机维护）
+#
+# Eak 的定位：把 Kakoune 默认的「选区式移动」换成 h/j/k/l 移动光标，
+# 用 z/x/e 进入 EakBeg/EakMid/EakEnd 用户模式针对首/中/尾做选区，
+# 把大量默认键重新分配。（默认键位参考 :doc keys / :doc mapping）
+#
+# 取舍原则：只做**不会破坏 Eak 内部自洽**的对齐，其余以「可选项」给出。
+# 本次实际改动：
+#   * % 从 Eak 的「选中当前词的所有出现」改回 Kakoune 默认的「全选缓冲区」
+#     （这是文档/教程里最常用、最不容出错的键之一）。
+#     需要「选中所有出现」时：kakrc 里已加 `SPC a`，或手按 * % s <ret>。
+#   * o/O/A 仍是 Eak 语义：o=重复上次对象选择，O=下方新行，A=上方新行。
+#     这是 Eak 自洽的一部分（去掉 o 会留下功能空洞），未强行改回默认；
+#     想改回可参考文件末尾「社区对齐可选覆写」。
+# ---------------------------------------------------------------------------
+
 
 declare-option -docstring 'sentence-stop regex' \
 str eak_sentence_stop [.!?]['")\]]*
@@ -1150,13 +1168,38 @@ map global goto f <esc>gf                               -docstring '> [file]'
 map global normal / ':eak-search-fd %val(count) <ret>'
 map global normal ? ':eak-search-bd %val(count) <ret>'
 map global normal X ':eak-truncate-search <ret>'
-map global normal <percent> *%s<ret>
+# [社区对齐] % = 全选缓冲区（Kakoune 默认）。
+# Eak 原意是「选中当前词的所有出现」（* % s <ret>）。现改回默认语义；
+# 该功能改由 kakrc 的 `SPC a` 提供（或手按 * % s <ret>）。
+# 如需改回 Eak 原映射，取消下一行注释：
+# map global normal <percent> *%s<ret>
 
 map global normal ! <a-|>
 map global normal <a-v> <a-U>                           # cf. Kakoune >= 2023.07.29
 map global normal @ ':eak-convert-space <ret>'
 
 map global normal <a-y> ':eak-surround <ret>'
+
+# ===========================================================================
+# 社区对齐可选覆写（默认全部注释；想更贴近 Kakoune 默认键位时逐条取消注释）
+# 注意：Eak 是自洽系统，改动可能留下功能空洞，启用后请自行复核。
+# ===========================================================================
+#
+# 1) 恢复 o/O/A 的「行插入」默认语义（Eak：o=重复对象选择，O=下方新行，A=上方新行）
+#    只取消 o 的静态映射还不够——Eak 会在运行时用 eak-set-object-repeat 动态改写 o；
+#    务必两处都改：
+# map global normal o o        # 下方新行插入（默认）
+# map global normal O O        # 上方新行插入（默认）
+# map global normal A A        # 行尾插入（默认）
+# define-command -override -hidden -params 1 eak-set-object-repeat %{ }
+#
+# 2) 恢复 q 记录宏 / Q 播放宏（Eak 把 q 用作「归并为单选区」、' 用作播放宏）
+# map global normal q q
+# map global normal Q Q
+#
+# 3) 恢复 H/L 为选区到行首/行尾（Eak 用作缩进；默认缩进是 </>）
+# map global normal H H
+# map global normal L L
 
 § # <= eak-map command end
 

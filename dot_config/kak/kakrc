@@ -1,29 +1,78 @@
 # kakrc — chezmoi 管理
-# 理念: 按照kakoune 的社区推荐键位,更符合人体工程学,减少和弦的配置.
+# 理念: 按照 kakoune 的社区推荐键位,更符合人体工程学,减少和弦的配置.
 # 人体工学重映射由 autoload/eak.kak 提供（Eak/Easy Kakoune, François Tonneau），
 # autoload/ 下文件启动时自动加载，无需显式 source。
 # eak 核心键位（选区即语言，动词在后）：
 #   z/x/e = 选区首/中/尾, - = 分组, q = 取消主选区, ' = 宏
 #   h/j/k/l/w/b = 选区式移动, t = 找字符, m = 括号配对, <a-q>/<a-r> = 轮换
 # 完整键位表见 eak.kak 内 eak-map 段。
+#
+# 本文件在 eak 之上补充：
+#   A. 恢复被 autoload/ 遮蔽的内置模块（filetype / 缩进 / grep / comment …）；
+#   B. 少量社区通用的舒适选项（终端 / 自动重载 / 搜索后端）；
+#   C. 社区插件 auto-pairs.kak（自动配对）+ 插入模式少和弦功能
+#      （jk / jj 退出插入、<tab> 跳出配对符号）；
+#   D. 修复 space r 重新加载（原 :config-reload 在本版本不存在）。
+
+# ── 恢复被遮蔽的内置模块（重要）──────────────────────────────
+# 内置模块位于 $kak_runtime/autoload：filetype 缩进与高亮、grep、comment、
+# format、jump、windowing 等。系统 kakrc 的逻辑是：
+#   「若 ~/.config/kak/autoload 存在，就只加载用户目录，忽略系统目录」。
+# 本机为安装 eak 建了 autoload/，于是所有内置模块都被遮蔽，
+# 导致 :grep、自动缩进、注释、格式化、git 等全部缺失。
+# 下面在「用户 autoload 存在」时补加载系统 autoload，恢复标准能力；
+# 若将来把 eak 移出 autoload（改为 source），此块会自动跳过，不会重复加载。
+# 用「哨兵命令」保证只执行一次：重复 source 本文件时 try 成功 → 跳过，
+# 避免重复 source 内置模块产生大量 'already defined' 报错。
+try %{ kakrc-system-modules-loaded } catch %{
+  define-command -override -hidden kakrc-system-modules-loaded nop
+  evaluate-commands %sh{
+    if [ -d "${kak_config}/autoload" ] && [ -d "${kak_runtime}/autoload" ]; then
+      find -L "${kak_runtime}/autoload" -type f -name '*.kak' \
+        | sed 's/.*/try %{ source "&" } catch %{ echo -debug Autoload: could not load "&" }/'
+    fi
+  }
+}
 
 # ── 显示 ─────────────────────────────────────────────────────
 set global scrolloff 5,5
-add-highlighter global/ number-lines -hlcursor
-add-highlighter global/ show-matching
-add-highlighter global/ wrap -word -indent
+# -override 使重复 source 时不报 duplicate id。
+add-highlighter -override global/ number-lines -hlcursor
+add-highlighter -override global/ show-matching
+add-highlighter -override global/ wrap -word -indent
 
 # ── 缩进 ──
 set global tabstop 4
 set global indentwidth 4
 
-# ── 移动时提示上下文 ──
-hook global WinDisplay .* info -anchor cursor
+# ── 通用舒适选项（社区常见推荐）─────────────────────────────
+# 终端标题随文件更新；同步输出可显著减少重绘闪烁。
+set global ui_options terminal_set_title=yes
+set global ui_options terminal_synchronized=yes
+# 鼠标支持：可点击定位、滚动、拖拽选择。
+# 注意：开启后终端原生框选需按住 Shift；不习惯可保留注释。
+# set global ui_options terminal_enable_mouse=true
 
-# ── App 用户模式 ──
+# 外部改动（git checkout / 其它编辑器保存）时自动重载缓冲区，
+# 省去手动的 :reload。（默认 ask，会弹确认。）
+set global autoreload yes
+
+# 用 ripgrep 做 :grep / :grep<ret>（已确认本机 /usr/sbin/rg）。
+# 输出 file:line:col:text，与 grep.kak 的解析规则一致。
+set global grepcmd 'rg --vimgrep --no-heading --smart-case'
+
+# ── 移动时提示上下文 ─────────────────────────────────────────
+# [WSL 适配] kakoune 2026.05.21 的 hook 不接受 info 的 -anchor 标志，
+# 启动会报 "'hook': unknown option '-anchor'"（可用 :buffer *debug* 查看）。
+# 原行保留在下方，换版本或需要时再按本机语法启用：
+# hook global WinDisplay .* info -anchor cursor
+
+# ── App 用户模式 ─────────────────────────────────────────────
 # 空格单击进入，单键替代 :w / :q 冒号命令，延续 eak 少和弦思路。
 # （eak 已占用 , 与 q，故前缀用空格；normal 模式空格无默认绑定，零冲突）
-declare-user-mode app
+try %{ declare-user-mode app }
+# 本版本没有内置 config-reload，这里提供一个可重复执行的重新加载命令。
+define-command -override -hidden reload-kakrc %{ source "%val{config}/kakrc" }
 map global normal <space> ':enter-user-mode app<ret>'
 map global app w ':write<ret>'                   -docstring 'save'
 map global app q ':quit<ret>'                    -docstring 'quit'
@@ -32,4 +81,113 @@ map global app n ':buffer-next<ret>'             -docstring 'next buffer'
 map global app p ':buffer-prev<ret>'             -docstring 'prev buffer'
 map global app b ':buffer<space>'                -docstring 'pick buffer'
 map global app f ':edit<space>'                  -docstring 'open file'
-map global app r ':config-reload<ret>'           -docstring 'reload config'
+map global app r ':reload-kakrc<ret>'            -docstring 'reload config'
+# [社区对齐] % 已还原为「全选缓冲区」，这里用 SPC a 提供「选中当前词的所有出现」
+define-command -override -hidden select-all-occurrences %{ execute-keys '*%s<ret>' }
+map global app a ':select-all-occurrences<ret>'  -docstring 'select all occurrences'
+
+# ══════════════════════════════════════════════════════════════
+# 插入模式的人性化功能
+# ══════════════════════════════════════════════════════════════
+
+# ── A. 自动配对括号 / 引号（社区插件 auto-pairs.kak）──────────
+# 键入 ( [ { " ' ` 时自动补右半边；在配对内按右半边键会「跳过」而不是重复插入；
+# 配对内回车自动缩进。插件本体：autoload/auto-pairs.kak
+#   来源: https://github.com/alexherbo2/auto-pairs.kak
+#         版本: latest (e812ee6, 2023-07-30)
+# 可用 auto_pairs 选项自定义配对表，disable-auto-pairs 关闭。
+# 若某些 filetype 不想自动配对，例如 Markdown，可加：
+#   hook global WinSetOption filetype=markdown %{ disable-auto-pairs }
+enable-auto-pairs
+
+# ── B. jk / jj 退出插入模式（等价于 <esc>）────────────────────
+# Kakoune 没有多键序列映射（map 只能绑单键），社区有两条路线：
+#   * 官方 wiki「Avoid-the-escape-key」的简版：
+#       hook global InsertChar k %{ try %{ exec -draft hH <a-k>jk<ret> d
+#                                          exec -with-hooks <esc> } }
+#     问题：只要缓冲区里已有 "jk"，再敲一个 k 也会误触发。
+#   * discuss.kakoune.com 上 Screwtapello 的「有状态」版（2024，alexherbo2 提议）：
+#     只在「上一个键就是 j」时才可能触发，不会误伤已有文本。
+# 这里采用后者思路，并加入 wiki 版的 -with-hooks：退出插入时若不加它，
+# ModeChange 钩子（如 filetype 的缩进/清理）不会触发（已实测验证）。
+# 官方来源：
+#   https://github.com/mawww/kakoune/wiki/Avoid-the-escape-key
+#   https://discuss.kakoune.com/t/escaping-from-insert-mode-with-jk/2557
+#
+# 代价与注意：
+#   * 会在极短时间内先插入再删除，肉眼不可见；
+#   * 想输入字面量 "jk" 时用 <c-v>j 转义（<c-v> 插入下一个键）；
+#   * 为控制开销，%sh 只在 j / k 两个键上触发，其余按键走纯 kak 分支。
+declare-option -hidden bool jk_pending false
+
+hook global InsertChar [jk] %{
+  evaluate-commands %sh{
+    if [ "$kak_opt_jk_pending" = true ]; then
+      printf 'set-option global jk_pending false\n'
+      printf 'execute-keys -with-hooks <backspace><backspace><esc>\n'
+    else
+      printf 'set-option global jk_pending true\n'
+    fi
+  }
+}
+# 任何其它字符、光标移动、删除或退出插入，都清除待定状态，
+# 避免「已有的 j + 新敲的 k」被误判为 jk。
+hook global InsertChar [^jk] %{ set-option global jk_pending false }
+hook global InsertMove .* %{ set-option global jk_pending false }
+hook global InsertDelete .* %{ set-option global jk_pending false }
+# 退出插入模式（<esc> / jk / 关闭窗口等）也清除状态。
+# 注意：本版本没有 InsertEnd 钩子，改用 ModeChange 的 pop:insert: 事件。
+hook global ModeChange ^pop:insert:.* %{ set-option global jk_pending false }
+
+# ── C. <tab> 跳出配对符号（tabout）───────────────────────────
+# 若光标右侧紧跟 ) ] } " ' `，<tab> 直接跳过它（不插入制表符）；
+# 否则按原始行为插入一个 <tab>。
+# 实现借助 <a-;>（插入模式下执行一条 normal 命令后回到插入），
+# 与社区插件 alexherbo2/auto-pairs.kak 用的是同一种技术：
+#   https://github.com/alexherbo2/auto-pairs.kak
+# （想同时要「自动补全括号对」再装它即可，与本段不冲突。）
+# 注：} 用 printf '\175' 生成，避免与 kak 的 %{...} 平衡括号冲突。
+define-command -override -hidden tabout %{
+  evaluate-commands %sh{
+    RBRACE=$(printf '\175')
+    case "$kak_selection" in
+      ')'|']'|"$RBRACE"|'"'|"'"|'`') printf 'execute-keys <right>\n' ;;
+      *) printf 'execute-keys <tab>\n' ;;
+    esac
+  }
+}
+map global insert <tab> '<a-;>:tabout<ret>' -docstring 'jump over closing delimiter'
+
+# ── D. 补全菜单键位：Tab=下一个候选 / Enter=接受 / Ctrl+Enter=接受并右移 ──
+# 背景：kakoune 的插入补全是「实时应用」——用 <c-n>/<c-p> 选候选时，选中项
+# 的文本会直接替换已输入文本，没有 nvim-cmp 那种「先选、再确认」的原生概念；
+# 而且插入模式下 <tab> 默认只是插入制表符（选候选是 <c-n>），C 段又把 <tab>
+# 占给了 tabout，于是补全的 Tab 操作就丢了。
+#
+# 这里用 InsertCompletionShow/Hide 钩子，只在补全菜单打开期间临时改写这三个键：
+#   <tab>   -> <c-n>    下一个候选（实时预览）
+#   <ret>   -> 保留当前候选、不插入换行（= 用户要的「接受」）
+#   <c-ret> -> 保留当前候选并把光标右移一格（不越出行边界）
+# 菜单关闭后解除，恢复：<tab> = tabout（C 段），<ret> = 正常换行（含 auto-pairs），
+# <c-ret> = 原行为。
+# 注意：
+#   * kakoune 在菜单弹出时可能已自动预选/应用首个候选，故「只有一个候选也不补全」
+#     这一点 kakoune 无法像 nvim 那样严格保证（它没有“未确认”的中间态）。
+#   * <c-ret> 能否送达取决于终端；很多终端 Ctrl+Enter 与 Enter 同码，那就等于「接受」。
+#   * auto-pairs 插件也会临时占 window 级 <ret>/<c-ret>（仅在自动配对后的下一个键）；
+#     下面用 try 包裹 unmap，避免冲突报错。
+define-command -override -hidden completion-accept %{ nop }
+define-command -override -hidden completion-accept-right %{ try %{ execute-keys <right> } }
+hook global InsertCompletionShow .* %{
+  try %{ unmap window insert <tab> }
+  try %{ unmap window insert <ret> }
+  try %{ unmap window insert <c-ret> }
+  map window insert <tab> '<c-n>'
+  map window insert <ret> '<a-;>:completion-accept<ret>'
+  map window insert <c-ret> '<a-;>:completion-accept-right<ret>'
+}
+hook global InsertCompletionHide .* %{
+  try %{ unmap window insert <tab> }
+  try %{ unmap window insert <ret> }
+  try %{ unmap window insert <c-ret> }
+}

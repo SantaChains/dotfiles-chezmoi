@@ -1,4 +1,4 @@
-[filter "lfs"]
+{{ if eq .chezmoi.os "windows" }}[filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
@@ -107,3 +107,16 @@
 	wl = worktree list
 	wd = worktree remove
 	pretty = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+{{ else }}# WSL 侧 git 配置：主体 include Windows 上 chezmoi 管的那份，改一处两边生效
+# （不能直接软链那份：里面有 schannel / delta 路径 / Windows 代理，Linux git 会报错）
+[include]
+	path = /mnt/c/Users/JliuPureey/.gitconfig
+
+# ── 仅 WSL/Linux 的差异覆盖（必须在 include 之后才会生效）──
+[http]
+	sslBackend = openssl
+	# schannel 是 Windows 专有后端，Linux git 只有 openssl/gnutls
+	# proxy 沿用 Windows 配置（127.0.0.1:6857 从 WSL 可达）
+	sslVerify = true
+	# 原值 false 是为 Windows 侧代理/MITM 场景；WSL 直连可正常校验证书（下方实测通过）
+{{ end }}

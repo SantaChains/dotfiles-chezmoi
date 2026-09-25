@@ -1,0 +1,106 @@
+{
+  "version": 3,
+  "skills": {
+    "benchmark-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "benchmark-model/SKILL.md",
+      "skillFolderHash": "84e5d642e9ccaba07e95b10224c3c4e41747b1ac",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.841Z",
+      "updatedAt": "2026-09-24T14:55:53.841Z"
+    },
+    "debug-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "debug-model/SKILL.md",
+      "skillFolderHash": "7ba2e1c29f365d899194af42ca66c8ea980084bc",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.843Z",
+      "updatedAt": "2026-09-24T14:55:53.843Z"
+    },
+    "eval-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "eval-model/SKILL.md",
+      "skillFolderHash": "e5046c5f2871d6c7e9c7ba4a4ce4d7f0d8f22600",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.844Z",
+      "updatedAt": "2026-09-24T14:55:53.844Z"
+    },
+    "import-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "import-model/SKILL.md",
+      "skillFolderHash": "6130d68d5aa221fe116ce7f8a3c5a81bd06b5986",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.847Z",
+      "updatedAt": "2026-09-24T14:55:53.847Z"
+    },
+    "mojo-gpu-fundamentals": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "mojo-gpu-fundamentals/SKILL.md",
+      "skillFolderHash": "201819b6e2a2419ae976845027d213b243dc90c1",
+      "pluginName": "mojo-skills",
+      "installedAt": "2026-09-24T14:55:53.848Z",
+      "updatedAt": "2026-09-24T14:55:53.848Z"
+    },
+    "mojo-python-interop": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "mojo-python-interop/SKILL.md",
+      "skillFolderHash": "ac056bb5f5113ed7400e47ea51527e10f916e770",
+      "pluginName": "mojo-skills",
+      "installedAt": "2026-09-24T14:55:53.850Z",
+      "updatedAt": "2026-09-24T14:55:53.850Z"
+    },
+    "mojo-syntax": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "mojo-syntax/SKILL.md",
+      "skillFolderHash": "7500918ff1b061b70ae7e7424e9edfbd63be71ce",
+      "pluginName": "mojo-skills",
+      "installedAt": "2026-09-24T14:55:53.851Z",
+      "updatedAt": "2026-09-24T14:55:53.851Z"
+    },
+    "new-modular-project": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "new-modular-project/SKILL.md",
+      "skillFolderHash": "b92dbd56e2b6b1268ceeef7baf28c6c445fa8e99",
+      "pluginName": "mojo-skills",
+      "installedAt": "2026-09-24T14:55:53.853Z",
+      "updatedAt": "2026-09-24T14:55:53.853Z"
+    },
+    "profile-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "profile-model/SKILL.md",
+      "skillFolderHash": "a8931c2885083d7760e7f119f1282866e780f089",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.855Z",
+      "updatedAt": "2026-09-24T14:55:53.855Z"
+    },
+    "serve-model": {
+      "source": "modular/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/modular/skills.git",
+      "skillPath": "serve-model/SKILL.md",
+      "skillFolderHash": "5fbe633e4b348c4a1a620a0968b04bfae9e0d728",
+      "pluginName": "max-skills",
+      "installedAt": "2026-09-24T14:55:53.857Z",
+      "updatedAt": "2026-09-24T14:55:53.857Z"
+    }
+  },
+  "dismissed": {}
+}
