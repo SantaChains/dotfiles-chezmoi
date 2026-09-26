@@ -18,7 +18,11 @@ esac
 # WSL 要逐个试探它们（9P/interop），实测每次 ~650ms（20 次 13s）。
 # 要调 Windows 程序请写绝对路径，如 /mnt/c/Windows/explorer.exe
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.config/emacs/bin:$PATH"
-path=(${path:#/mnt/*})
+typeset -U path                          # path 与 PATH 绑定：之后赋值自动去重
+path=(${path:#/mnt/*})                   # 剔除 Windows 目录
+typeset -a _p                            # 再剔除已不存在的残留目录
+for _d in $path; do [[ -d $_d ]] && _p+=($_d); done   # 如 ~/.pi/agent/bin
+path=($_p); unset _p _d
 
 # ── 历史 ──────────────────────────────────────────────────────
 HISTFILE=~/.zsh_history
@@ -32,6 +36,16 @@ export EDITOR=nvim
 export VISUAL=nvim
 export PAGER=less
 export MANPAGER='less -R'
+
+# ── LLVM/Clang 工具链（官方 extra 仓库：clang / llvm / lld / lldb）──
+# 构建脚本（make / CMake / configure）认这些变量。想临时改回 gcc：
+#   CC=gcc CXX=g++ make ...        或      unset CC CXX
+if command -v clang >/dev/null 2>&1; then
+  export CC=clang CXX=clang++
+fi
+if command -v llvm-config >/dev/null 2>&1; then
+  export LLVM_CONFIG="$(command -v llvm-config)"
+fi
 
 # ── fzf（官方 zsh 集成：Ctrl-R 历史 / Ctrl-T 文件 / Alt-C 跳目录）──
 # 用 fd 作为来源：自带、快、尊重 .gitignore；排除常见大目录。
@@ -127,6 +141,18 @@ nvm() {
 
 # ── Doom Emacs 便捷命令：dm ───────────────────────────────────
 [ -f "$HOME/.config/shell/doom.sh" ] && source "$HOME/.config/shell/doom.sh"
+
+# ── yazi：文件管理器；退出后 cd 到最后浏览的目录（官方 zsh 包装）──────
+# 用法：`y [路径]`；退出 yazi 后当前 shell 会跟到最后所在目录。
+if command -v yazi >/dev/null 2>&1; then
+  function y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+    rm -f -- "$tmp"
+  }
+fi
 
 # ── 插件（必须最后 source 语法高亮）──────────────────────────
 # 自动建议：灰字补全历史命令

@@ -1,12 +1,3 @@
-# x-cmd：懒加载。x-cmd 的 rc.fish 会让 fish 启动慢约 1.2s，这里改成首次调用 x 时才加载。
-# [已禁用] function x --description 'x-cmd (lazy load on first use)'
-# [已禁用]     functions -e x
-# [已禁用]     source "$HOME/.x-cmd.root/local/data/fish/rc.fish"
-# [已禁用]     if functions -q x
-# [已禁用]         x $argv
-# [已禁用]     else
-# [已禁用]         echo 'x-cmd 初始化失败：可手动 source ~/.x-cmd.root/local/data/fish/rc.fish' >&2
-# [已禁用]     end
 # ─────────────────────────────────────────────────────────────
 #  ~/.config/fish/config.fish   (Arch Linux on WSL2)
 #  详细说明见 Windows 侧 D:/Linux/ARCH-WSL2-使用手册.md
@@ -23,6 +14,17 @@ set -gx VISUAL nvim
 set -gx PAGER less
 set -gx MANPAGER 'less -R'
 set -g fish_greeting ""                      # 关掉启动问候
+
+# --- LLVM/Clang 工具链（官方 extra 仓库：clang / llvm / lld / lldb）---
+# 构建脚本（make / CMake / configure）认这些变量。想临时改回 gcc：
+#   env CC=gcc CXX=g++ make ...
+if type -q clang
+    set -gx CC clang
+    set -gx CXX clang++
+end
+if type -q llvm-config
+    set -gx LLVM_CONFIG (command -v llvm-config)
+end
 
 # --- 缩写（abbr：输入时展开，回车前可见，比 alias 更适合交互）---
 abbr -a g   git
@@ -69,6 +71,16 @@ set --export PATH $BUN_INSTALL/bin $PATH
 # 想保留某几个（如 VS Code 的 bin），把下面一行改成白名单写法：
 #   set -gx PATH /mnt/c/Users/Jliu\ Pureey/AppData/Local/Programs/Microsoft\ VS\ Code/bin $PATH
 set -gx PATH (string match -v "/mnt/*" $PATH)
+
+# --- 清理冗余目录：去重 + 丢弃已不存在的 ---
+# 例：残留的 ~/.pi/agent/bin 会让每次命令查找都多试探一次
+set -l _p
+for d in $PATH
+    test -d $d; or continue                 # 丢弃已不存在的目录
+    contains -- $d $_p; and continue        # 丢弃重复项（保留首次出现的顺序）
+    set -a _p $d
+end
+set -gx PATH $_p
 
 # ─────────────────────────────────────────────────────────────
 #  新增工具集成（守卫写法：没装就跳过，装了下次开 shell 自动生效）

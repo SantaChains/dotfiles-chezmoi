@@ -31,7 +31,7 @@
 
 
 
-# 分析规范并排版代码,但先分类设置,哪些git的,bash的,ucrt的wsl pwsh和pwsh模块的,x-cmd的,禁用的仍然保持禁用,按优先级排版顺序,但pwsh优先
+# 分析规范并排版代码,但先分类设置,哪些git的,bash的,ucrt的wsl pwsh和pwsh模块的,禁用的仍然保持禁用,按优先级排版顺序,但pwsh优先
 # 仅在交互式、非 POSIX 模式下启用
 if [ -z "$BASH_VERSION" ] || [ -z "$PS1" ]; then
     return
@@ -101,13 +101,7 @@ export CARGO_REGISTRIES_CRATES_IO_INDEX="https://mirrors.ustc.edu.cn/crates.io-i
 # export PATH="$HOME/.local/bin:$PATH"
 
 # ---------------------------------------------------------
-# 2. x-cmd 加载（仅当文件存在）
-# ---------------------------------------------------------
-# X_CMD="$HOME/.x-cmd.root/X"
-# [[ -f $X_CMD ]] && source "$X_CMD"
-
-# ---------------------------------------------------------
-# 3. 终端行为 & 历史记录
+# 2. 终端行为 & 历史记录
 # ---------------------------------------------------------
 # 忽略重复命令、加大历史记录
 HISTCONTROL=ignoreboth:erasedups
@@ -117,13 +111,13 @@ shopt -s histappend              # 多会话实时追加历史
 shopt -s checkwinsize            # 自动更新窗口大小
 
 # ---------------------------------------------------------
-# 4. 彩色与别名
+# 3. 彩色与别名
 # ---------------------------------------------------------
 # # 4-1 颜色开关
 # export LS_OPTIONS='--color=auto'
 # [[ -x /usr/bin/dircolors ]] && eval "$(dircolors -b)"
 
-# 4-2 常用别名
+# 3-2 常用别名
 alias ll='ls -alF --color=auto'
 alias la='ls -A --color=auto'
 alias l='ls -CF --color=auto'
@@ -136,25 +130,25 @@ alias ..='cd ..'
 alias ...='cd ../..'
 
 # ---------------------------------------------------------
-# 5. 安全别名（防止误操作）
+# 4. 安全别名（防止误操作）
 # ---------------------------------------------------------
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
 
 # ---------------------------------------------------------
-# 6. 提示符（PS1）
+# 5. 提示符（PS1）
 # ---------------------------------------------------------
 # 简洁彩色提示符：用户@主机:路径 $
 PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\] \$ '
 
 # ---------------------------------------------------------
-# 7. 杂项
+# 6. 杂项
 # ---------------------------------------------------------
-# 7-1 让 less 支持颜色
+# 6-1 让 less 支持颜色
 export LESS='-R'
 
-# 7-2 让 man 使用彩色高亮
+# 6-2 让 man 使用彩色高亮
 export LESS_TERMCAP_mb=$'\e[01;31m'
 export LESS_TERMCAP_md=$'\e[01;38;5;74m'
 export LESS_TERMCAP_me=$'\e[0m'
@@ -163,14 +157,13 @@ export LESS_TERMCAP_so=$'\e[38;5;246m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[04;38;5;146m'
 
-# 7-3 启用 bash-completion（若已安装）
+# 6-3 启用 bash-completion（若已安装）
 # [[ -f /usr/share/bash-completion/bash_completion ]] && \
 #     source /usr/share/bash-completion/bash_completion
 
 # =============================================================================
 #  END OF FILE
 # =============================================================================
-# [ ! -f "$HOME/.x-cmd.root/X" ] || . "$HOME/.x-cmd.root/X" # boot up x-cmd.
 
 # 1. 让 ls 带颜色、带大小单位
 alias ll='ls -alFh --color=auto --group-directories-first'
@@ -214,6 +207,35 @@ fi
 {{ else }}#
 # user-local binaries (uv tool shims, node/npm symlinks)
 export PATH="$HOME/.local/bin:$PATH"
+
+# ── LLVM/Clang 工具链（官方 extra 仓库：clang / llvm / lld / lldb）──
+# 构建脚本（make / CMake / configure）认这些变量。想临时改回 gcc：
+#   CC=gcc CXX=g++ make ...        或      unset CC CXX
+# 放在交互式判断之前，保证非交互式 shell（脚本、CI）也能拿到。
+if command -v clang >/dev/null 2>&1; then
+  export CC=clang CXX=clang++
+fi
+if command -v llvm-config >/dev/null 2>&1; then
+  export LLVM_CONFIG="$(command -v llvm-config)"
+fi
+
+# ── PATH 清理：去重 + 丢弃已不存在的目录（保持原有顺序）──────────
+# 为什么留着：pi、编辑器等工具会往 PATH 里 prepend 用户目录，其中常夹着
+# 已删除的残留（如 ~/.pi/agent/bin）。重复项拖慢命令查找，失效项也让
+# PATH 难以排查。定义放在「非交互式 return」之前，各类 shell 都能用。
+# 调用点在文件末尾；因为只有本分支定义了它，那边用 command -v 守卫。
+_path_clean() {
+  local out="" d
+  while IFS= read -r d; do
+    [ -n "$d" ] || continue          # 跳过空项（PATH 里的 :: 或首尾冒号）
+    [ -d "$d" ] || continue          # 丢弃已不存在的目录
+    case ":$out:" in *":$d:"*) continue ;; esac
+    out="${out:+$out:}$d"
+  done < <(printf '%s\n' "$PATH" | tr ':' '\n')
+  PATH="$out"
+  export PATH
+}
+
 # ~/.bashrc
 #
 
@@ -229,6 +251,20 @@ export NVM_DIR="$HOME/.nvm"
 
 # Doom Emacs 便捷命令：dm
 [ -f "$HOME/.config/shell/doom.sh" ] && . "$HOME/.config/shell/doom.sh"
-
-[ ! -f "$HOME/.x-cmd.root/X" ] || . "$HOME/.x-cmd.root/X" # boot up x-cmd.
 {{ end }}
+# ── yazi：文件管理器；退出后 cd 到最后浏览的目录（官方 bash 包装）──────
+# 用法：`y [路径]`；退出 yazi 后当前 shell 会跟到最后所在目录。
+# 注：放在模板末尾，Windows/Linux 两分支共用；非交互式 shell 已提前 return。
+if command -v yazi >/dev/null 2>&1; then
+  function y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+    rm -f -- "$tmp"
+  }
+fi
+
+# 清掉上面这些工具插进来的重复/失效目录（_path_clean 仅 Linux 分支定义，
+# Windows 侧没有该函数，所以用 command -v 守卫）
+command -v _path_clean >/dev/null 2>&1 && _path_clean
