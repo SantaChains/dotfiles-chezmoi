@@ -19,13 +19,12 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-telescope/telescope-symbols.nvim", name = "telescope-symbols" },
 	{ src = "https://github.com/nvim-telescope/telescope-ui-select.nvim", name = "telescope-ui-select" },
 	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf" },
-	{ src = "https://github.com/nvim-telescope/telescope-file-browser.nvim", name = "telescope-file-browser" },
 	{ src = "https://github.com/2kabhishek/nerdy.nvim", name = "telescope-nerdy" },
 })
 
 -- perf: telescope 的 require + setup 约占启动 190ms（实测 995 → 803ms）。
 -- 改成首次按键才加载，与已有的 DapLoad() 同一套路。键位见 config/binds.lua 的 tb()。
--- 注意：file_browser 的 hijack_netrw 只有在 TelescopeLoad() 之后才生效。
+-- 目录不再走 telescope：netrw 已退役，目录由 mini.files 接管（见 mini.lua）。
 local loaded = false
 function TelescopeLoad()
 	if loaded then return end
@@ -67,10 +66,6 @@ function TelescopeLoad()
 			},
 		},
 		extensions = {
-			file_browser = {
-				theme = "ivy",
-				hijack_netrw = true,
-			},
 			["ui-select"] = {
 				require("telescope.themes").get_dropdown({}),
 			},
@@ -78,7 +73,6 @@ function TelescopeLoad()
 	})
 
 	pcall(require("telescope").load_extension, "fzf")
-	require("telescope").load_extension("file_browser")
 	require("telescope").load_extension("ui-select")
 	require("telescope").load_extension("nerdy")
 end
