@@ -88,14 +88,11 @@ require("blink.cmp").build():pwait()
 -- Jump out of an empty pair: cursor sits between opening and closing char
 local pair_close = { ["("] = ")", ["["] = "]", ["{"] = "}", ['"'] = '"', ["'"] = "'", ["`"] = "`" }
 local function tabout(cmp)
+	-- auto_insert = false 后菜单不会预写文本，这里不再需要 cmp.cancel()；
+	-- 保留 cmp 参数是为了键位表里能直接引用同一函数。
+	local _ = cmp
 	local line = vim.api.nvim_get_current_line()
 	local col = vim.api.nvim_win_get_cursor(0)[2]
-	-- 面板可见时先撤销 auto_insert 的预览，否则预览文本会留在缓冲区里
-	if cmp and cmp.is_menu_visible() then
-		cmp.cancel()
-		line = vim.api.nvim_get_current_line()
-		col = vim.api.nvim_win_get_cursor(0)[2]
-	end
 	local close = pair_close[line:sub(col, col)]
 	if close and line:sub(col + 1, col + 1) == close then
 		vim.api.nvim_win_set_cursor(0, { vim.api.nvim_win_get_cursor(0)[1], col + 1 })
@@ -156,8 +153,10 @@ require("blink.cmp").setup({
 		},
 		list = {
 			selection = {
-				preselect = false,
-				auto_insert = true,
+				-- preselect=true：菜单一弹出就高亮第一项
+				-- auto_insert=false：选中只移动高亮，不预写进缓冲区；回车才上屏
+				preselect = true,
+				auto_insert = false,
 			},
 		},
 		menu = {
