@@ -54,6 +54,14 @@ vim.lsp.config("hls", {
 
 vim.lsp.config("golangci_lint_ls", {})
 
+vim.lsp.config("clangd", {
+	-- clangd 靠 compile_commands.json 做精确分析；用 cmake 的项目建议：
+	--   cmake -S. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+	-- 然后把 build/compile_commands.json 拷/链接到项目根目录。
+	cmd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=iwyu" },
+	root_markers = { "compile_commands.json", "compile_flags.txt", ".clangd", ".git" },
+})
+
 vim.lsp.config("ltex", {
 	diagnostics = { disable = { "missing-fields" } },
 })
@@ -63,6 +71,7 @@ vim.lsp.enable({
 	"ts_ls",
 	"pylsp",
 	"cssls",
+	"clangd", -- C / C++
 	"svelte",
 	"rust_analyzer",
 	"gopls",
@@ -75,12 +84,50 @@ vim.lsp.enable({
 
 require("blink.cmp").build():pwait()
 
+-- Jump out of an empty pair: cursor sits between opening and closing char
+local pair_close = { ["("] = ")", ["["] = "]", ["{"] = "}", ['"'] = '"', ["'"] = "'", ["`"] = "`" }
+local function tabout(cmp)
+	local line = vim.api.nvim_get_current_line()
+	local col = vim.api.nvim_win_get_cursor(0)[2]
+	-- 面板可见时先撤销 auto_insert 的预览，否则预览文本会留在缓冲区里
+	if cmp and cmp.is_menu_visible() then
+		cmp.cancel()
+		line = vim.api.nvim_get_current_line()
+		col = vim.api.nvim_win_get_cursor(0)[2]
+	end
+	local close = pair_close[line:sub(col, col)]
+	if close and line:sub(col + 1, col + 1) == close then
+		vim.api.nvim_win_set_cursor(0, { vim.api.nvim_win_get_cursor(0)[1], col + 1 })
+		return true
+	end
+	return false
+end
+
+-- Accept completion, then shift cursor right one char without crossing line end.
+-- Must move inside accept()'s callback: blink v2 applies the edit asynchronously,
+-- so reading the cursor right after accept() still gives the pre-accept position.
+local function accept_and_move_right(cmp)
+	return cmp.accept({
+		callback = function()
+			local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+			if col < #vim.api.nvim_get_current_line() then
+				vim.api.nvim_win_set_cursor(0, { row, col + 1 })
+			end
+		end,
+	})
+end
+
 require("blink.cmp").setup({
 	fuzzy = { implementation = "rust" },
 	appearance = { use_nvim_cmp_as_default = true },
 
 	keymap = {
-		["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+		-- snippet 最先（否则 tabout 会把光标移出占位符），然后 tabout，再补全下一项，最后 Tab 原生
+		["<Tab>"] = { "snippet_forward", tabout, "select_next", "fallback" },
+		["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
+		["<CR>"] = { "accept", "fallback" },
+		["<C-CR>"] = { "cancel", "fallback" },
+		["<S-CR>"] = { accept_and_move_right, "fallback" },
 	},
 
 	signature = {
