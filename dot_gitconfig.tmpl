@@ -107,6 +107,17 @@
 	wl = worktree list
 	wd = worktree remove
 	pretty = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+	ida = !cd \"${GIT_PREFIX:-.}\" && \"D:/App/reverse/ida/tools/teams/git-ida.exe\"
+[credential "helperselector"]
+	selected = manager
+[credential "https://github.com"]
+	helper = 
+	helper = !'D:\\soft\\gh.exe' auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !'D:\\soft\\gh.exe' auth git-credential
+[credential]
+	helper = manager
 {{ else }}# WSL 侧 git 配置：主体 include Windows 上 chezmoi 管的那份，改一处两边生效
 # （不能直接软链那份：里面有 schannel / delta 路径 / Windows 代理，Linux git 会报错）
 [include]

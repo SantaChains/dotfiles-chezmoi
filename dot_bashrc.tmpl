@@ -1,229 +1,11 @@
-{{ if eq .chezmoi.os "windows" }}
+# ~/.bashrc — 由 chezmoi 渲染：Windows（Git Bash / MSYS2）与 WSL/Linux 共用一套
+# 骨架，能力与 ~/.zshrc、~/.config/fish/config.fish 对齐：用户级 PATH、clang
+# 工具链、历史与补全、yazi 的 cd 包装。
 
-# 置顶 curl谷歌和docker pull无法同时生效的解决方案：
-# 1、
-# 网络模式是mirrored：
-# 1.wsl settings关掉自带的自动戴笠，这个自动戴笠有点问题，会导致docker pull找不到正确的地址
-# 2.戴笠工具【不需要】开启局域网连接
-# 3.然后在ubuntu子系统的~/.bashrc文件，最后添加以下设置，也就是手动设置戴笠：
-# （vim操作自己搜一下，不赘述）
-# # 设置代理环境变量（端口按实际修改）
-# export http_proxy=http://localhost:10808
-# export https_proxy=http://localhost:10808
-# export all_proxy=socks5://localhost:10808
-# 
-# 保存好 ~/.bashrc 之后
-# source ~/.bashrc
-# 使其生效
-# 2、网络模式是Nat：
-# 开了防火墙的，去防火墙设置里把你的工具设置为白名单
-# wsl settings的自动戴笠建议关闭
-# 戴笠工具里设置好【允许局域网访问】
-# ubuntu子系统的~/.bashrc文件，最后添加以下设置：
-# # 获取 Windows 主机 IP
-# host_ip=$(ip route | awk '/default/ {print $3}')
-# # 设置戴笠环境变量（端口按实际修改）
-# export http_proxy=http://$host_ip:10808
-# export https_proxy=http://$host_ip:10808
-# export all_proxy=socks5://$host_ip:10808
-# 保存好~/.bashrc之后
-# source ~/.bashrc
-
-
-
-# 分析规范并排版代码,但先分类设置,哪些git的,bash的,ucrt的wsl pwsh和pwsh模块的,禁用的仍然保持禁用,按优先级排版顺序,但pwsh优先
-# 仅在交互式、非 POSIX 模式下启用
-if [ -z "$BASH_VERSION" ] || [ -z "$PS1" ]; then
-    return
-fi
-
-# 启用可编程补全功能（如果 /etc/bash.bashrc 和 /etc/profile 等系统文件已启用，可无需重复配置）
-# 检查当前环境是否为非 POSIX 模式（避免与极简环境冲突）
-# if ! shopt -oq posix; then
-#     # 优先加载较新的 bash-completion 路径（多数现代 Linux 发行版用此）
-#     if [ -f /usr/share/bash-completion/bash_completion ]; then
-#         . /usr/share/bash-completion/bash_completion
-#     # 兼容旧版系统路径（如部分老版本 CentOS、Debian 等）
-#     elif [ -f /etc/bash_completion ]; then
-#         . /etc/bash_completion
-#     fi
-# fi
-
-#NAT        模式(局域网),防火墙开启软件和代理
-# 获取主机IP
-#host_ip=$(ip route | awk'/default/{print $3}')
-#or Tun模式
-# export http_proxy=http://$host_ip:6857
-# export https_proxy=https://$host_ip:6857
-# exprot all_proxy=socks://$host_ip:6857
-
-
-# Mirrored 模式使用,wsl setting关闭自动代理
-# auto_proxy
-# 不开启局域网(端口6857)
-# export http_proxy=http://localhost:6857
-# export https_proxy=https://localhost:6857
-# export all_proxy=socks://localhost:6857
-
-
-# export ACCOUNT=<Your ACCOUNT> # just for cloudflare
-
-# ---------------------------------------------------------
-# 0. 安全开关：非交互式 shell 直接返回
-# ---------------------------------------------------------
-# case $- in
-#     *i*) ;;
-#       *) return;;
-# esac
-
-# ---------------------------------------------------------
-# 1. 核心环境变量
-# ---------------------------------------------------------
-# 1-1 代理自动探测（仅 WSL 交互式 shell）
-# if [[ -t 0 && -z "${WSLENV}" ]]; then
-#     HOST_IP=$(awk '/nameserver/{print $2}' /etc/resolv.conf | head -n1)
-#     PROXY_PORT=6857            # 按需修改
-#     http_proxy="http://${HOST_IP}:${PROXY_PORT}"
-#     https_proxy="$http_proxy"
-# 
-#     timeout 1 bash -c ">/dev/tcp/${HOST_IP}/${PROXY_PORT}" 2>/dev/null && {
-#         export http_proxy https_proxy all_proxy="$http_proxy"
-#         export HTTP_PROXY HTTPS_PROXY ALL_PROXY="$http_proxy"
-#     }
-# fi
-
-# 1-2 Rust / Cargo 国内镜像
-export RUSTUP_DIST_SERVER="https://mirrors.ustc.edu.cn/rust-static"
-export RUSTUP_UPDATE_ROOT="https://mirrors.ustc.edu.cn/rust-static/rustup"
-export CARGO_REGISTRIES_CRATES_IO_INDEX="https://mirrors.ustc.edu.cn/crates.io-index"
-
-# 1-3 PATH 扩展示例（可自行追加）
-# export PATH="$HOME/.local/bin:$PATH"
-
-# ---------------------------------------------------------
-# 2. 终端行为 & 历史记录
-# ---------------------------------------------------------
-# 忽略重复命令、加大历史记录
-HISTCONTROL=ignoreboth:erasedups
-HISTSIZE=10000
-HISTFILESIZE=20000
-shopt -s histappend              # 多会话实时追加历史
-shopt -s checkwinsize            # 自动更新窗口大小
-
-# ---------------------------------------------------------
-# 3. 彩色与别名
-# ---------------------------------------------------------
-# # 4-1 颜色开关
-# export LS_OPTIONS='--color=auto'
-# [[ -x /usr/bin/dircolors ]] && eval "$(dircolors -b)"
-
-# 3-2 常用别名
-alias ll='ls -alF --color=auto'
-alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
-alias vi='vim'
-alias c='clear'
-alias ..='cd ..'
-alias ...='cd ../..'
-
-# ---------------------------------------------------------
-# 4. 安全别名（防止误操作）
-# ---------------------------------------------------------
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
-
-# ---------------------------------------------------------
-# 5. 提示符（PS1）
-# ---------------------------------------------------------
-# 简洁彩色提示符：用户@主机:路径 $
-PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\] \$ '
-
-# ---------------------------------------------------------
-# 6. 杂项
-# ---------------------------------------------------------
-# 6-1 让 less 支持颜色
-export LESS='-R'
-
-# 6-2 让 man 使用彩色高亮
-export LESS_TERMCAP_mb=$'\e[01;31m'
-export LESS_TERMCAP_md=$'\e[01;38;5;74m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[38;5;246m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[04;38;5;146m'
-
-# 6-3 启用 bash-completion（若已安装）
-# [[ -f /usr/share/bash-completion/bash_completion ]] && \
-#     source /usr/share/bash-completion/bash_completion
-
-# =============================================================================
-#  END OF FILE
-# =============================================================================
-
-# 1. 让 ls 带颜色、带大小单位
-alias ll='ls -alFh --color=auto --group-directories-first'
-alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
-
-# 2. 更友好的 git log
-alias gitlog="git log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all"
-
-# 3. 代理自动切换（示例）
-if ping -c 1 192.168.50.100 &>/dev/null; then
-  export http_proxy=http://192.168.50.100:7890
-  export https_proxy=$http_proxy
-  echo "→ office proxy enabled"
-else
-  unset http_proxy https_proxy
-fi
-
-# 4. 让中文不乱码
-export LANG=zh_CN.UTF-8
-export LESSCHARSET=utf-8
-
-# 5. 历史命令更丰富
-export HISTCONTROL=ignoredups:erasedups
-export HISTSIZE=10000
-shopt -s histappend
-PROMPT_COMMAND='history -a; history -c; history -r'
-
-# 6. 提示符：当前目录 + git 分支
-parse_git_branch() {
-  git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-}
-PS1='\[\e[36m\]\W\[\e[32m\]$(parse_git_branch)\[\e[0m\] $ '
-
-# 7. 自动补全增强
-if [ -f /usr/share/bash-completion/bash_completion ]; then
-  source /usr/share/bash-completion/bash_completion
-fi
-
-[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
-{{ else }}#
-# user-local binaries (uv tool shims, node/npm symlinks)
-export PATH="$HOME/.local/bin:$PATH"
-
-# ── LLVM/Clang 工具链（官方 extra 仓库：clang / llvm / lld / lldb）──
-# 构建脚本（make / CMake / configure）认这些变量。想临时改回 gcc：
-#   CC=gcc CXX=g++ make ...        或      unset CC CXX
-# 放在交互式判断之前，保证非交互式 shell（脚本、CI）也能拿到。
-if command -v clang >/dev/null 2>&1; then
-  export CC=clang CXX=clang++
-fi
-if command -v llvm-config >/dev/null 2>&1; then
-  export LLVM_CONFIG="$(command -v llvm-config)"
-fi
-
-# ── PATH 清理：去重 + 丢弃已不存在的目录（保持原有顺序）──────────
-# 为什么留着：pi、编辑器等工具会往 PATH 里 prepend 用户目录，其中常夹着
-# 已删除的残留（如 ~/.pi/agent/bin）。重复项拖慢命令查找，失效项也让
-# PATH 难以排查。定义放在「非交互式 return」之前，各类 shell 都能用。
-# 调用点在文件末尾；因为只有本分支定义了它，那边用 command -v 守卫。
+# ── PATH 清理：去重 + 丢弃已不存在的目录（保持首次出现顺序）──────────
+# 为什么需要：pi、编辑器等工具会往 PATH 里 prepend 用户目录，其中常夹着已删
+# 的残留（如 ~/.pi/agent/bin）。重复项拖慢命令查找，失效项让 PATH 难排查。
+# 定义放在两条 OS 分支之前，两边共用；调用点在文件末尾。
 _path_clean() {
   local out="" d
   while IFS= read -r d; do
@@ -236,28 +18,145 @@ _path_clean() {
   export PATH
 }
 
-# ~/.bashrc
-#
+{{ if eq .chezmoi.os "windows" }}
+# ═══ Windows 侧（Git Bash / MSYS2）═══════════════════════════════════
 
-# If not running interactively, don't do anything
+# 用户级目录（与 zsh/fish 一致）；放在交互式判断之前，脚本里也能用
+for _d in "$HOME/.local/bin" "$HOME/.bun/bin" "$HOME/.config/emacs/bin"; do
+  [ -d "$_d" ] || continue
+  case ":$PATH:" in *":$_d:"*) ;; *) PATH="$_d:$PATH" ;; esac
+done
+unset _d
+export PATH
+
+# clang/LLVM 工具链：构建脚本（make / CMake / configure）认这两个变量。
+# 想临时改回 gcc：CC=gcc CXX=g++ make ...
+if command -v clang >/dev/null 2>&1; then
+  export CC=clang CXX=clang++
+fi
+if command -v llvm-config >/dev/null 2>&1; then
+  export LLVM_CONFIG="$(command -v llvm-config)"
+fi
+
+# 非交互式（脚本、CI）到此为止：PATH / CC 已经就位
+if [ -z "$BASH_VERSION" ] || [ -z "$PS1" ]; then
+  return 0 2>/dev/null || exit 0
+fi
+
+# ── 环境变量 ─────────────────────────────────────────────────────────
+: "${LANG:=zh_CN.UTF-8}"
+export LANG
+export LESSCHARSET=utf-8
+export LESS='-R'
+# Rust / Cargo 国内镜像
+export RUSTUP_DIST_SERVER="https://mirrors.ustc.edu.cn/rust-static"
+export RUSTUP_UPDATE_ROOT="https://mirrors.ustc.edu.cn/rust-static/rustup"
+export CARGO_REGISTRIES_CRATES_IO_INDEX="https://mirrors.ustc.edu.cn/crates.io-index"
+
+# ── 历史 ────────────────────────────────────────────────────────────
+HISTCONTROL=ignoreboth:erasedups
+HISTSIZE=10000
+HISTFILESIZE=20000
+shopt -s histappend              # 多会话实时追加历史
+shopt -s checkwinsize            # 自动更新窗口大小
+# 追加而不是覆盖：覆盖式赋值会冲掉其它工具注册的 PROMPT_COMMAND
+PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+
+# ── 别名：ls 系列走 eza（真 ls 用 \ls），其余与 zsh/fish 对齐 ─────────
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -la --icons --git --group-directories-first'
+  alias la='eza -a --icons'
+  alias lt='eza --tree --level=2 --icons'
+else
+  alias ls='ls --color=auto'
+  alias ll='ls -alFh --color=auto --group-directories-first'
+  alias la='ls -A --color=auto'
+fi
+alias grep='grep --color=auto'
+alias vi='vim'
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias gitlog="git log --graph --pretty=format:'%h %ad | %s%d [%an]' --abbrev-commit --all"
+# 防误操作
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# ── 补全 ────────────────────────────────────────────────────────────
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+  . /usr/share/bash-completion/bash_completion
+elif [ -f /etc/bash_completion ]; then
+  . /etc/bash_completion
+fi
+
+# Kiro 终端集成：只在 kiro 的终端里加载，命令不存在时不报错
+if [ "${TERM_PROGRAM:-}" = "kiro" ] && command -v kiro >/dev/null 2>&1; then
+  . "$(kiro --locate-shell-integration-path bash)"
+fi
+
+# ── 提示符：当前目录 + git 分支 ──────────────────────────────────────
+parse_git_branch() {
+  git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+PS1='\[\e[36m\]\W\[\e[32m\]$(parse_git_branch)\[\e[0m\] $ '
+
+# ── 可选：办公网代理（默认关闭）────────────────────────────────────
+# 以前每次开 shell 都 ping 一次，失败还会 unset 别处设好的代理：既拖慢启动，
+# 又会把代理变量清掉。现在改成显式开启：OFFICE_PROXY=1 bash
+if [ "${OFFICE_PROXY:-0}" = 1 ] && ping -n 1 -w 1000 192.168.50.100 >/dev/null 2>&1; then
+  export http_proxy=http://192.168.50.100:7890
+  export https_proxy="$http_proxy"
+fi
+
+{{ else }}
+# ═══ WSL / Linux 侧 ══════════════════════════════════════════════════
+
+# 用户级目录：uv tool 的 shim、bun、doom CLI
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.config/emacs/bin:$PATH"
+
+# clang/LLVM 工具链（同上）
+if command -v clang >/dev/null 2>&1; then
+  export CC=clang CXX=clang++
+fi
+if command -v llvm-config >/dev/null 2>&1; then
+  export LLVM_CONFIG="$(command -v llvm-config)"
+fi
+
+# 非交互式（脚本、CI）到此为止
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto'
+# 别名：ls 走 eza（真 ls 用 \ls）
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -la --icons --git --group-directories-first'
+  alias la='eza -a --icons'
+  alias lt='eza --tree --level=2 --icons'
+else
+  alias ls='ls --color=auto'
+fi
 PS1='[\u@\h \W]\$ '
 
+# nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
 # Doom Emacs 便捷命令：dm
 [ -f "$HOME/.config/shell/doom.sh" ] && . "$HOME/.config/shell/doom.sh"
 {{ end }}
-# ── yazi：文件管理器；退出后 cd 到最后浏览的目录（官方 bash 包装）──────
-# 用法：`y [路径]`；退出 yazi 后当前 shell 会跟到最后所在目录。
-# 注：放在模板末尾，Windows/Linux 两分支共用；非交互式 shell 已提前 return。
+
+# ── 共用尾巴：PATH 清理 / yazi 包装 / flyline ─────────────────────────
+# 清掉工具插进来的重复与失效目录（函数定义在文件顶部）
+_path_clean
+
+# yazi：文件管理器；退出后 cd 到最后浏览的目录（官方 bash 包装）
+# 用法：`y [路径]`
 if command -v yazi >/dev/null 2>&1; then
   function y() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    local tmp cwd
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")" || return 1
     yazi "$@" --cwd-file="$tmp"
     IFS= read -r -d '' cwd < "$tmp"
     [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
@@ -265,15 +164,8 @@ if command -v yazi >/dev/null 2>&1; then
   }
 fi
 
-# 清掉上面这些工具插进来的重复/失效目录（_path_clean 仅 Linux 分支定义，
-# Windows 侧没有该函数，所以用 command -v 守卫）
-command -v _path_clean >/dev/null 2>&1 && _path_clean
-
-# ── flyline：Rust 写的 readline 替代（Bash 可加载 builtin）────────────
-# 来源：本机 flyline 仓库的 release 构建，已复制到 ~/.local/lib/libflyline.so。
-# enable 会接管 Bash 的输入流，必须在交互式 shell 里加载（非交互式上面已 return）。
-# 鼠标捕获按要求关闭；想恢复默认：`flyline mouse --mode smart`。
-# 升级：重跑 `cargo build --release`，再把 target/release/libflyline.so 复制过来。
+# flyline：Rust 实现的 readline 替代（Bash builtin），仅当 .so 存在时加载。
+# 升级：重跑 cargo build --release，再把 target/release/libflyline.so 复制过来。
 if [[ -f "$HOME/.local/lib/libflyline.so" ]]; then
   enable -f "$HOME/.local/lib/libflyline.so" flyline 2>/dev/null && \
     flyline mouse --mode disabled

@@ -135,7 +135,12 @@ bindkey '^H' backward-kill-word
 export NVM_DIR="$HOME/.nvm"
 nvm() {
   unfunction nvm 2>/dev/null
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  # 先确认脚本真的存在再 source：否则 unfunction 后调用外部 nvm 会直接报 command not found
+  if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+    echo "nvm: 找不到 $NVM_DIR/nvm.sh" >&2
+    return 1
+  fi
+  . "$NVM_DIR/nvm.sh"
   nvm "$@"
 }
 

@@ -60,9 +60,8 @@ abbr -a pRns  'sudo pacman -Rns'
 #   curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish \
 #     | source && fisher install jorgebucaran/nvm.fish
 
-# bun
+# bun（bin 目录已在上面用 fish_add_path 加过，这里只设变量，避免重复项）
 set --export BUN_INSTALL "$HOME/.bun"
-set --export PATH $BUN_INSTALL/bin $PATH
 
 # --- 去掉 Windows PATH（appendWindowsPath 带进来的 73 个 /mnt/* 目录）---
 # 为什么：命令找不到时，WSL 要逐个试探这些 Windows 目录（9P/interop），
