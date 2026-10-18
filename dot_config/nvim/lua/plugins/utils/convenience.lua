@@ -6,6 +6,16 @@ vim.pack.add({
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
 })
 
+-- flash: 开两个开关 —— 搜时出标签 + f/t 多目标出标签
+require("flash").setup({
+	modes = {
+		-- / 搜索时直接给所有匹配打标签（搜索中可用 <C-s> 关闭，见 config/binds.lua）
+		search = { enabled = true },
+		-- f / F / t / T 命中多处时为每个匹配显示标签，按标签选一个
+		char = { jump_labels = true },
+	},
+})
+
 require("auto-save").setup({
 	enabled = true,
 	trigger_events = {
@@ -36,4 +46,4 @@ require("scrollEOF").setup({
 })
 
 -- Undotree keymap (undotree is a VimScript plugin, use its command)
-vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>")
+vim.keymap.set("n", "<leader>u", ":UndotreeToggle<CR>", { desc = "Toggle undo tree" })

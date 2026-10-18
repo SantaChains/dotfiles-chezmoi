@@ -20,6 +20,8 @@ vim.opt.incsearch = true
 require("plugins.init")
 require("config.autocmd")
 require("config.binds")
+-- hydra 的入口映射必须晚于 binds 建，否则被 binds 里的同名前缀映射覆盖
+require("config.hydra")
 
 -- Colorscheme
 vim.cmd.colorscheme("catppuccin")

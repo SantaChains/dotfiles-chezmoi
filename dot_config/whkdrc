@@ -1,1 +1,28 @@
-alt + r : powershell
+# whkdrc — whkd 热键配置 (纯启动器，不依赖 komorebi)
+#
+# 1) .shell 是必需项：缺了会让 whkd 启动即 panic（报错会误导为 "could not load whkdrc from"）
+# 2) app 相关的 [ ] 块必须紧跟在 .shell / .pause 之后，普通绑定必须放在最后
+# 3) 会话 shell 是非交互的隐藏窗口：裸写 powershell/pwsh/cmd 不会弹出窗口（继承隐藏控制台），
+#    要开窗口必须用 Start-Process；GUI 程序(wt/chrome/code/explorer)不受影响
+#
+# app 名 = 前台窗口进程的 FileDescription，例：chrome.exe -> "Google Chrome"，
+#          可用 (Get-Item <exe>).VersionInfo.FileDescription 查看
+.shell pwsh
+
+# 一键暂停/恢复所有热键（再按一次恢复）
+.pause alt + shift + p
+
+# 进程级分支：同一热键在不同应用下做不同的事
+alt + n [
+    Default       : wt -w 0 nt
+    Google Chrome : Ignore
+]
+
+alt + Return : wt
+alt + b      : Start-Process chrome
+# Edge 若要用：Start-Process 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+alt + e      : Start-Process code
+alt + f      : Start-Process explorer
+alt + d      : Start-Process 'D:\Soft'
+# 打开可见的 PowerShell 窗口（Start-Process 才会真正弹窗）
+alt + r      : Start-Process pwsh

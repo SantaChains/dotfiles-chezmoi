@@ -38,8 +38,6 @@ require("mini.move").setup({ -- move selection in visual mode
 	},
 })
 
-require("mini.icons").setup() -- Icon provider
-
 local animate = require("mini.animate") -- animations ovs
 require("mini.animate").setup({
 	cursor = {
@@ -51,5 +49,39 @@ require("mini.animate").setup({
 		timing = animate.gen_timing.linear({ duration = 100, unit = "total" }),
 		-- Animate equally but with at most 120 steps instead of default 60
 		subscroll = animate.gen_subscroll.equal({ max_output_steps = 60 }),
+	},
+})
+
+-- 按前缀键后列出下一步可用键；描述自动取自各映射的 desc 字段
+-- （见 config/binds.lua、config/hydra.lua）。前缀组本身没有映射，clue 里单独补。
+local miniclue = require("mini.clue")
+miniclue.setup({
+	triggers = {
+		{ mode = "n", keys = "<Leader>" },
+		{ mode = "n", keys = "<C-T>" },
+		{ mode = { "n", "x" }, keys = "g" },
+		{ mode = { "n", "x" }, keys = "z" },
+		{ mode = "n", keys = "<C-w>" },
+		{ mode = { "i", "c" }, keys = "<C-x>" },
+		{ mode = { "i", "c" }, keys = "<C-r>" },
+	},
+	clues = {
+		-- 分组标题
+		{ mode = "n", keys = "<Leader>f", desc = "+Find" },
+		{ mode = "n", keys = "<Leader>c", desc = "+Code" },
+		{ mode = "n", keys = "<Leader>q", desc = "+Session" },
+		{ mode = "n", keys = "<Leader>t", desc = "+Terminal" },
+		-- 内置键位
+		miniclue.gen_clues.builtin_completion(),
+		miniclue.gen_clues.g(),
+		miniclue.gen_clues.marks(),
+		miniclue.gen_clues.registers(),
+		miniclue.gen_clues.windows(),
+		miniclue.gen_clues.z(),
+	},
+	window = {
+		-- timeoutlen 默认 1000，留一点余量让窗口跟得上按键
+		delay = 200,
+		config = { width = "auto", border = "rounded" },
 	},
 })

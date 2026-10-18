@@ -1,8 +1,8 @@
 vim.pack.add({
 	{ src = "https://github.com/mfussenegger/nvim-dap", name = "dap" },
-	{ src = "https://github.com/leoluz/nvim-dap-go", name = "dap-go" },
 	{ src = "https://github.com/rcarriga/nvim-dap-ui", name = "dapui" },
 	{ src = "https://github.com/theHamsta/nvim-dap-virtual-text", name = "dap-virtual-text" },
+	-- nvim-nio 是 dapui 的硬依赖（dapui 内部 require("nio")），不能删
 	{ src = "https://github.com/nvim-neotest/nvim-nio", name = "nvim-nio" },
 })
 
@@ -15,7 +15,6 @@ function DapLoad()
 	if not ok then return end
 
 	require("nvim-dap-virtual-text").setup()
-	require("dap-go").setup()
 	require("dapui").setup()
 
 	local dapui = require("dapui")
@@ -31,11 +30,21 @@ function DapLoad()
 end
 
 -- DAP keymaps
-local opts = { noremap = true, silent = true }
-vim.keymap.set("n", "<F1>", ":lua DapLoad() require'dap'.repl.open()<CR>", opts)
-vim.keymap.set("n", "<F11>", ":lua DapLoad() require'dap'.continue()<CR>", opts)
-vim.keymap.set("n", "<F12>", ":lua DapLoad() require'dap'.terminate()<CR>", opts)
-vim.keymap.set("n", "<leader>b", ":lua DapLoad() require'dap'.toggle_breakpoint()<CR>", opts)
-vim.keymap.set("n", "<leader>B", ":lua DapLoad() require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>", opts)
-vim.keymap.set("n", "<leader>lp", ":lua DapLoad() require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>", opts)
-vim.keymap.set("n", "<leader>dt", ":lua DapLoad() require'dap-go'.debug_test()<CR>", opts)
+local function dap_map(key, rhs, desc)
+	vim.keymap.set("n", key, rhs, { noremap = true, silent = true, desc = desc })
+end
+
+dap_map("<F1>", ":lua DapLoad() require'dap'.repl.open()<CR>", "Open DAP REPL")
+dap_map("<F11>", ":lua DapLoad() require'dap'.continue()<CR>", "DAP continue")
+dap_map("<F12>", ":lua DapLoad() require'dap'.terminate()<CR>", "DAP terminate")
+dap_map("<leader>b", ":lua DapLoad() require'dap'.toggle_breakpoint()<CR>", "Toggle breakpoint")
+dap_map(
+	"<leader>B",
+	":lua DapLoad() require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
+	"Set condition breakpoint"
+)
+dap_map(
+	"<leader>lp",
+	":lua DapLoad() require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
+	"Set log point"
+)

@@ -110,6 +110,18 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- LSP: highlight references on CursorHold, clear on CursorMoved
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
+		-- <Esc> 关掉悬浮窗（hover / signature / 诊断浮窗），顺带清搜索高亮。
+		-- 仅在该 buffer 生效：非 LSP buffer 的 <Esc> 保持默认。
+		vim.keymap.set("n", "<Esc>", function()
+			pcall(function() require("noice").cmd("dismiss") end)
+			for _, win in ipairs(vim.api.nvim_list_wins()) do
+				if vim.api.nvim_win_get_config(win).relative ~= "" then
+					pcall(vim.api.nvim_win_close, win, true)
+				end
+			end
+			pcall(vim.cmd, "nohlsearch")
+		end, { buffer = args.buf, desc = "Close floats" })
+
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		if client and client.server_capabilities.documentHighlightProvider then
 			local grp = vim.api.nvim_create_augroup("lsp_document_highlight_" .. args.buf, { clear = true })

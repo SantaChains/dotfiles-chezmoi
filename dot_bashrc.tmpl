@@ -268,3 +268,13 @@ fi
 # 清掉上面这些工具插进来的重复/失效目录（_path_clean 仅 Linux 分支定义，
 # Windows 侧没有该函数，所以用 command -v 守卫）
 command -v _path_clean >/dev/null 2>&1 && _path_clean
+
+# ── flyline：Rust 写的 readline 替代（Bash 可加载 builtin）────────────
+# 来源：本机 flyline 仓库的 release 构建，已复制到 ~/.local/lib/libflyline.so。
+# enable 会接管 Bash 的输入流，必须在交互式 shell 里加载（非交互式上面已 return）。
+# 鼠标捕获按要求关闭；想恢复默认：`flyline mouse --mode smart`。
+# 升级：重跑 `cargo build --release`，再把 target/release/libflyline.so 复制过来。
+if [[ -f "$HOME/.local/lib/libflyline.so" ]]; then
+  enable -f "$HOME/.local/lib/libflyline.so" flyline 2>/dev/null && \
+    flyline mouse --mode disabled
+fi
