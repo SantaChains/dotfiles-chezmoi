@@ -1,28 +1,118 @@
-# whkdrc — whkd 热键配置 (纯启动器，不依赖 komorebi)
+# ══════════════════════════════════════════════════════════════════
+#  whkdrc — komorebi 热键守护进程配置
+#  与 ~/.glzr/glazewm/config.yaml 键位一一对应：一套肌肉记忆，两个引擎
+#  仅在【Komorebi 模式】启用（GlazeWM 自己处理热键，切换脚本会自动停 whkd）
 #
-# 1) .shell 是必需项：缺了会让 whkd 启动即 panic（报错会误导为 "could not load whkdrc from"）
-# 2) app 相关的 [ ] 块必须紧跟在 .shell / .pause 之后，普通绑定必须放在最后
-# 3) 会话 shell 是非交互的隐藏窗口：裸写 powershell/pwsh/cmd 不会弹出窗口（继承隐藏控制台），
-#    要开窗口必须用 Start-Process；GUI 程序(wt/chrome/code/explorer)不受影响
-#
-# app 名 = 前台窗口进程的 FileDescription，例：chrome.exe -> "Google Chrome"，
-#          可用 (Get-Item <exe>).VersionInfo.FileDescription 查看
+#  语法红线：
+#   1) .shell 必须有，缺了 whkd 启动即 panic
+#   2) 应用分支块 [ ] 必须紧跟 .shell / .pause；普通绑定必须放最后
+#   3) 命令在常驻 pwsh 会话里串行执行 → 启动类命令一律 Start-Process，避免阻塞后续热键
+#   4) komorebi 工作区索引从 0 开始：Alt+1 → focus-workspace 0
+#   5) Alt 单层 = 焦点/工作区/启动器；Alt+Shift 层 = 移动/状态/调整（与你的启动器零冲突）
+# ══════════════════════════════════════════════════════════════════
 .shell pwsh
 
-# 一键暂停/恢复所有热键（再按一次恢复）
-.pause alt + shift + p
+# 紧急熔断：一次性暂停/恢复 whkd 全部热键（WM 自身的软暂停是 Alt+Shift+P）
+.pause ctrl + alt + shift + p
 
-# 进程级分支：同一热键在不同应用下做不同的事
+# ── 进程级分支：新终端标签；Chrome 前台时让位给浏览器自身的快捷键 ──
 alt + n [
-    Default       : wt -w 0 nt
+    Default       : Start-Process wt -ArgumentList '-w','0','nt'
     Google Chrome : Ignore
 ]
 
-alt + Return : wt
+# ── 焦点 ── Alt + hjkl / 方向键 ──────────────────────────────────
+alt + h        : komorebic focus left
+alt + j        : komorebic focus down
+alt + k        : komorebic focus up
+alt + l        : komorebic focus right
+alt + left     : komorebic focus left
+alt + down     : komorebic focus down
+alt + up       : komorebic focus up
+alt + right    : komorebic focus right
+
+# 循环焦点：跨容器前后跳（komorebi 专属语义）
+alt + oem_4    : komorebic cycle-focus previous
+alt + oem_6    : komorebic cycle-focus next
+
+# ── 移动窗口 ── Alt + Shift + hjkl / 方向键 ─────────────────────
+alt + shift + h     : komorebic move left
+alt + shift + j     : komorebic move down
+alt + shift + k     : komorebic move up
+alt + shift + l     : komorebic move right
+alt + shift + left  : komorebic move left
+alt + shift + down  : komorebic move down
+alt + shift + up    : komorebic move up
+alt + shift + right : komorebic move right
+
+# ── 工作区 ── Alt + 1..9 切；Alt + Shift + 1..9 把窗口送过去（不切焦点）──
+alt + 1 : komorebic focus-workspace 0
+alt + 2 : komorebic focus-workspace 1
+alt + 3 : komorebic focus-workspace 2
+alt + 4 : komorebic focus-workspace 3
+alt + 5 : komorebic focus-workspace 4
+alt + 6 : komorebic focus-workspace 5
+alt + 7 : komorebic focus-workspace 6
+alt + 8 : komorebic focus-workspace 7
+alt + 9 : komorebic focus-workspace 8
+
+alt + shift + 1 : komorebic move-to-workspace 0
+alt + shift + 2 : komorebic move-to-workspace 1
+alt + shift + 3 : komorebic move-to-workspace 2
+alt + shift + 4 : komorebic move-to-workspace 3
+alt + shift + 5 : komorebic move-to-workspace 4
+alt + shift + 6 : komorebic move-to-workspace 5
+alt + shift + 7 : komorebic move-to-workspace 6
+alt + shift + 8 : komorebic move-to-workspace 7
+alt + shift + 9 : komorebic move-to-workspace 8
+
+# ── 显示器（单屏下为空操作，多屏时按物理顺序前后跳）────────────
+alt + oem_comma          : komorebic cycle-monitor previous
+alt + oem_period         : komorebic cycle-monitor next
+alt + shift + oem_comma  : komorebic cycle-move-workspace-to-monitor previous
+alt + shift + oem_period : komorebic cycle-move-workspace-to-monitor next
+
+# ── 窗口状态 ────────────────────────────────────────────────────
+alt + space         : komorebic toggle-float
+alt + shift + space : komorebic toggle-monocle
+alt + shift + m     : komorebic minimize
+alt + shift + q     : komorebic close
+alt + shift + t     : komorebic toggle-tiling
+alt + shift + v     : komorebic toggle-workspace-layer
+alt + shift + return: komorebic promote
+
+# ── 尺寸微调（0.03 步长，见 komorebi.json resize_delta 未设=默认）──
+alt + shift + u : komorebic resize-axis horizontal decrease
+alt + shift + i : komorebic resize-axis horizontal increase
+alt + shift + o : komorebic resize-axis vertical increase
+alt + shift + n : komorebic resize-axis vertical decrease
+
+# ── 布局（komorebi 专属）──────────────────────────────────────────
+alt + shift + c : komorebic cycle-layout next
+alt + shift + x : komorebic cycle-layout previous
+alt + shift + b : komorebic change-layout bsp
+alt + shift + g : komorebic change-layout grid
+alt + shift + y : komorebic change-layout ultrawide-vertical-stack
+alt + shift + s : komorebic change-layout scrolling
+alt + shift + a : komorebic flip-layout horizontal
+alt + shift + d : komorebic flip-layout vertical
+
+# ── 容器堆叠（komorebi 专属）─────────────────────────────────────
+alt + shift + oem_4 : komorebic cycle-stack previous
+alt + shift + oem_6 : komorebic cycle-stack next
+alt + shift + oem_7 : komorebic stack right
+alt + shift + oem_1 : komorebic unstack
+
+# ── 引擎控制 ────────────────────────────────────────────────────
+alt + shift + p : komorebic toggle-pause
+alt + shift + r : komorebic replace-configuration "$Env:USERPROFILE\komorebi.json"
+alt + shift + w : komorebic retile
+alt + shift + e : komorebic stop
+
+# ── 应用启动器（沿用你原有键位，不动肌肉记忆）───────────────────
+alt + return : Start-Process wt
 alt + b      : Start-Process chrome
-# Edge 若要用：Start-Process 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
 alt + e      : Start-Process code
 alt + f      : Start-Process explorer
 alt + d      : Start-Process 'D:\Soft'
-# 打开可见的 PowerShell 窗口（Start-Process 才会真正弹窗）
 alt + r      : Start-Process pwsh
