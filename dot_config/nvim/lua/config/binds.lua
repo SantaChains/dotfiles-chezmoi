@@ -8,9 +8,8 @@ function Keymap(mode, key, binding, opts)
 end
 
 Keymap("n", "q:", ":", { desc = "Open command line" }) -- remove nonsense command
-Keymap("n", "<leader>bd", function() -- delete buffer
-	vim.cmd("bd")
-	vim.cmd("echo 'Buffer deleted'")
+Keymap("n", "<leader>bd", function() -- delete buffer, 保留窗口布局
+	MiniBufremove.delete()
 end, { desc = "Delete buffer" })
 
 for _, bind in ipairs({ "i", "a", "A", "I" }) do
@@ -96,13 +95,14 @@ Keymap("n", "<leader>ff", function()
 end, { desc = "Find files" })
 
 Keymap("n", "<space>fn", function()
-	TelescopeLoad()
-	local full_path = vim.api.nvim_buf_get_name(0)
-	local dir = vim.fn.fnamemodify(full_path, ":h")
-	require("telescope").extensions.file_browser.file_browser({
-		path = dir,
-	})
-end, { desc = "Browse files" })
+	-- 有文件名就定位到它，否则开当前目录
+	local name = vim.api.nvim_buf_get_name(0)
+	if name ~= "" and vim.bo.buftype == "" then
+		MiniFiles.open(name)
+	else
+		MiniFiles.open()
+	end
+end, { desc = "File explorer" })
 
 Keymap("n", "<space>fs", function() -- select sessions
 	MiniSessions.select()
