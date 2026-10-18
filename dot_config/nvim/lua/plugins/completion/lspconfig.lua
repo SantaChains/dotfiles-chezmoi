@@ -20,7 +20,8 @@ vim.lsp.config("lua_ls", {
 })
 
 vim.lsp.config("rust_analyzer", {
-	cmd = { "LspProxy", "--", "rust-analyzer" },
+	-- Windows 上 rust-analyzer 走 LspProxy（代理/隔离）；WSL/Linux 用原生的
+	cmd = vim.fn.has("win32") == 1 and { "LspProxy", "--", "rust-analyzer" } or { "rust-analyzer" },
 })
 
 vim.lsp.config("gopls", {
