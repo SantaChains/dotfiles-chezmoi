@@ -2,6 +2,9 @@ vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", nam
 
 require("nvim-treesitter").install({
 	"bash",
+	"c",
+	"cpp",
+	"css",
 	"html",
 	"svelte",
 	"latex",
@@ -12,6 +15,7 @@ require("nvim-treesitter").install({
 	"markdown_inline",
 	"query",
 	"regex",
+	"rust",
 	"tsx",
 	"typescript",
 	"python",
