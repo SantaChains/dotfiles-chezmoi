@@ -1,5 +1,19 @@
 vim.pack.add({ { src = "https://github.com/nvimtools/hydra.nvim", name = "hydra" } })
 
+-- hydra.nvim 1.0.3 仍在用 vim.validate({...}) 旧签名（上游 PR #72 至今未合并），
+-- nvim 0.12 每次启动刷 4 条 deprecated。这里把旧签名桥到新签名；
+-- hydra 加载前就位即可，等上游修好这整段可删。
+local _validate = vim.validate
+vim.validate = function(a, b, c, d, e)
+	if type(a) == "table" and b == nil then
+		for name, spec in pairs(a) do
+			_validate(name, spec[1], spec[2], spec[3], spec[4])
+		end
+		return
+	end
+	return _validate(a, b, c, d, e)
+end
+
 -- noice 接管了 cmdline，hydra 默认的 cmdline 提示看不见，统一走浮动窗口
 local Hydra = require("hydra")
 Hydra.setup({
