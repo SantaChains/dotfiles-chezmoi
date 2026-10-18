@@ -128,6 +128,7 @@ preloaders = [
 	{ mime = "application/ms-opentype", run = "font" },
 ]
 prepend_previewers = [
+	{ url = "*.docx", run = "docx-preview" },
 	{ mime = "application/*zip",                     run = "ouch" },
 	{ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", run = "ouch" },
 ]
