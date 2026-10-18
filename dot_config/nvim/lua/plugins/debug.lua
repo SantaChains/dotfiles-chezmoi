@@ -37,14 +37,14 @@ end
 dap_map("<F1>", ":lua DapLoad() require'dap'.repl.open()<CR>", "Open DAP REPL")
 dap_map("<F11>", ":lua DapLoad() require'dap'.continue()<CR>", "DAP continue")
 dap_map("<F12>", ":lua DapLoad() require'dap'.terminate()<CR>", "DAP terminate")
-dap_map("<leader>b", ":lua DapLoad() require'dap'.toggle_breakpoint()<CR>", "Toggle breakpoint")
+dap_map("<leader>Bb", ":lua DapLoad() require'dap'.toggle_breakpoint()<CR>", "Toggle breakpoint")
 dap_map(
-	"<leader>B",
+	"<leader>Bc",
 	":lua DapLoad() require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
 	"Set condition breakpoint"
 )
 dap_map(
-	"<leader>lp",
+	"<leader>Bl",
 	":lua DapLoad() require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
 	"Set log point"
 )
