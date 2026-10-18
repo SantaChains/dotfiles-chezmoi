@@ -1,11 +1,16 @@
 # https://clangd.llvm.org//config
+# 注意：这是"用户级"clangd 配置，对本机所有工程生效。
+# 而且它在配置合并时最后生效 —— 会压过各工程自己的 .clangd 里同名的项
+# （实测：工程 .clangd 写 -std=c++26 也压不过这里的 -std）。
+# 所以改这里的 -std 会影响所有工程；改动前的原件留了 config.yaml.bak。
 Hover:
   ShowAKA: Yes
 CompileFlags:
   Add: [
-      "-std=c++17", # need when using msvc
-      "-ID:\\langcode\\Qt\\6.10.2\\msvc2022_64\\include",
-      "-ID:\\Soft\\SCOOP\\apps\\boost\\1.90.0",
+      "-std=c++26", # 2026-09-29 从 c++17 改成新的标准（旧值见下一行注释）
+      # "-std=c++17",  # ← 旧值，留作备查
+      "-ID:\\langcode\\Qt\\6.10.2\\msvc2022_64\\include", # Qt：给别的工程用的，本工程用不到
+      "-ID:\\Soft\\SCOOP\\apps\\boost\\1.90.0", # boost：同上
       "-Wno-unused-value",
     ]
 Diagnostics:
