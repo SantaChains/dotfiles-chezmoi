@@ -22,14 +22,33 @@ require("mini.indentscope").setup({ -- shows indents
 
 require("mini.trailspace").setup() -- Shows useless spaces
 
--- 文件浏览器：替代 netrw/telescope-file_browser 的日常浏览（<Space>fn 打开）
--- use_as_default_explorer = false：netrw 已由 telescope-file-browser 的 hijack_netrw 接管，
--- 再让 mini.files 劫持会双重接管，而且它的 `autocmd! FileExplorer *` 在新版 Neovim
--- 里会往 v:errmsg 里塞 E216（虽然被 silent! 盖住，但污染诊断）。
+-- 文件浏览器：<Space>fn 打开 mini.files（telescope-file-browser 已退役：它只剩 hijack_netrw
+-- 一个作用，属冗余）。
+-- use_as_default_explorer = false 是故意的：自带的 netrw 劫持会执行 `autocmd! FileExplorer *`，
+-- 在 nvim 0.12 里往 v:errmsg 塞 E216；下面自己写几行接管。
 require("mini.files").setup({ options = { use_as_default_explorer = false } })
+
+-- netrw 退役：任何 `:e <目录>` 都交给 mini.files
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.api.nvim_create_autocmd("BufEnter", {
+	callback = function(args)
+		local name = vim.api.nvim_buf_get_name(args.buf)
+		if name == "" or vim.fn.isdirectory(name) ~= 1 then
+			return
+		end
+		vim.api.nvim_buf_delete(args.buf, { force = true })
+		vim.schedule(function()
+			MiniFiles.open(name)
+		end)
+	end,
+	desc = "Open directories with mini.files",
+})
 
 -- 删 buffer 但保留窗口布局（比 :bd 更安全，不会连带关窗口）
 require("mini.bufremove").setup()
+
+-- 图标统一由 nvim-web-devicons 提供，不启用 mini.icons（避免双 icon provider）。
 
 require("mini.sessions").setup({ -- dir based session management (autosave/recovery handled by remember.nvim)
 	autoread = false,
