@@ -88,7 +88,7 @@ require("blink.cmp").build():pwait()
 -- Jump out of an empty pair: cursor sits between opening and closing char
 local pair_close = { ["("] = ")", ["["] = "]", ["{"] = "}", ['"'] = '"', ["'"] = "'", ["`"] = "`" }
 local function tabout(cmp)
-	-- auto_insert = false 后菜单不会预写文本，这里不再需要 cmp.cancel()；
+	-- auto_insert = false 后菜单不会预写文本，原先撤销预览的那段逻辑已移除；
 	-- 保留 cmp 参数是为了键位表里能直接引用同一函数。
 	local _ = cmp
 	local line = vim.api.nvim_get_current_line()
