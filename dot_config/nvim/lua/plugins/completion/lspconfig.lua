@@ -118,7 +118,8 @@ local function accept_and_move_right(cmp)
 end
 
 require("blink.cmp").setup({
-	fuzzy = { implementation = "rust" },
+	-- prefer_rust_*：rust 版模糊匹配器缺失时自动退回 Lua（不会因为新机器没编译而报错）
+	fuzzy = { implementation = "prefer_rust_with_warning" },
 	appearance = { use_nvim_cmp_as_default = true },
 
 	keymap = {
@@ -134,12 +135,23 @@ require("blink.cmp").setup({
 		enabled = false,
 	},
 
+	-- 命令行补全（: / ? 等）：与插入模式一致地自动弹菜单
+	cmdline = {
+		keymap = { preset = "inherit" },
+		completion = { menu = { auto_show = true } },
+	},
+
 	completion = {
 		trigger = {
 			show_on_insert = true,
 			show_on_trigger_character = true,
 			show_on_keyword = true,
 			show_on_backspace = true,
+		},
+		-- 选中项自动弹出文档（hover 详情），延迟比菜单略长以免抢焦点
+		documentation = {
+			auto_show = true,
+			auto_show_delay_ms = 200,
 		},
 		list = {
 			selection = {
