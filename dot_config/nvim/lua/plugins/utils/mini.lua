@@ -23,7 +23,10 @@ require("mini.indentscope").setup({ -- shows indents
 require("mini.trailspace").setup() -- Shows useless spaces
 
 -- 文件浏览器：替代 netrw/telescope-file_browser 的日常浏览（<Space>fn 打开）
-require("mini.files").setup()
+-- use_as_default_explorer = false：netrw 已由 telescope-file-browser 的 hijack_netrw 接管，
+-- 再让 mini.files 劫持会双重接管，而且它的 `autocmd! FileExplorer *` 在新版 Neovim
+-- 里会往 v:errmsg 里塞 E216（虽然被 silent! 盖住，但污染诊断）。
+require("mini.files").setup({ options = { use_as_default_explorer = false } })
 
 -- 删 buffer 但保留窗口布局（比 :bd 更安全，不会连带关窗口）
 require("mini.bufremove").setup()
