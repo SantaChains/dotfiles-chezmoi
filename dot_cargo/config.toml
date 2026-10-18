@@ -91,3 +91,21 @@ linker = "rust-lld.exe"
 
 # 注: 此处不放 rustflags —— 实测(2026-09 cargo 1.100 nightly)空数组也按"已设置"处理,
 #     会静默覆盖 build.rustflags, 导致 target-cpu=native 丢失
+
+# ============================================================
+# 按需开关（2026-10-12 追加）
+# 默认 LLVM 后端 / legacy trait solver 保持不动，只在显式调用时切换：
+#   cargo cg / cargo cgr   → cranelift 后端（编译快；生成码质量低于 LLVM），产物隔离在 target/cranelift/
+#   cargo ns               → next-gen trait solver（类型检查阶段提速，不改机器码）
+# 为什么不做默认：
+#   1) 两者都会使增量缓存失效（切回即全量重编）；
+#   2) cranelift 产物与 LLVM 产物并存 → 磁盘占用上升（本机 C: 约 30G / D: 约 56G 空闲，磁盘才是瓶颈）；
+#   3) cranelift 生成码运行时性能通常弱于 LLVM，发布构建仍应走默认。
+# 实测依据（cargo 1.101.0-nightly）：`unstable.codegen-backend=true` + profile 的
+# codegen-backend 会让 rustc 收到 `-Z codegen-backend=cranelift`，且不覆盖 build.rustflags。
+# ns 必须显式重述 target-cpu=native：build.rustflags 与 --config/RUSTFLAGS 是替换关系，不是合并。
+# ============================================================
+[alias]
+cg = ["build", "--config", "unstable.codegen-backend=true", "--config", "profile.dev.codegen-backend=\"cranelift\"", "--config", "build.target-dir=\"target/cranelift\""]
+cgr = ["run", "--config", "unstable.codegen-backend=true", "--config", "profile.dev.codegen-backend=\"cranelift\"", "--config", "build.target-dir=\"target/cranelift\""]
+ns = ["check", "--config", "build.rustflags=[\"-C\",\"target-cpu=native\",\"-Znext-solver\"]"]
