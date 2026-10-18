@@ -67,9 +67,12 @@ miniclue.setup({
 	},
 	clues = {
 		-- 分组标题
-		{ mode = "n", keys = "<Leader>f", desc = "+Find" },
+		{ mode = "n", keys = "<Leader>b", desc = "+Buffer" },
+		{ mode = "n", keys = "<Leader>B", desc = "+Debug" },
 		{ mode = "n", keys = "<Leader>c", desc = "+Code" },
+		{ mode = "n", keys = "<Leader>f", desc = "+Find" },
 		{ mode = "n", keys = "<Leader>q", desc = "+Session" },
+		{ mode = "n", keys = "<Leader>s", desc = "+Search" },
 		{ mode = "n", keys = "<Leader>t", desc = "+Terminal" },
 		-- 内置键位
 		miniclue.gen_clues.builtin_completion(),
