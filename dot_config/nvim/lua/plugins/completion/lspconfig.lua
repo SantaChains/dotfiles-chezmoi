@@ -122,7 +122,9 @@ require("blink.cmp").setup({
 
 	keymap = {
 		-- snippet 最先（否则 tabout 会把光标移出占位符），然后 tabout，再补全下一项，最后 Tab 原生
-		["<Tab>"] = { "snippet_forward", tabout, "select_next", "fallback" },
+		-- 顺序要紧：select_next 必须在 tabout 前面。
+		-- 否则菜单弹着时 Tab 会被 tabout（光标在空括号里）或原生 Tab 截走，下一项永远触发不到。
+		["<Tab>"] = { "snippet_forward", "select_next", tabout, "fallback" },
 		["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
 		["<CR>"] = { "accept", "fallback" },
 		["<C-CR>"] = { "cancel", "fallback" },
