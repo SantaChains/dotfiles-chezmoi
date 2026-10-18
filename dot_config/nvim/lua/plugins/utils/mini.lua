@@ -22,6 +22,12 @@ require("mini.indentscope").setup({ -- shows indents
 
 require("mini.trailspace").setup() -- Shows useless spaces
 
+-- 文件浏览器：替代 netrw/telescope-file_browser 的日常浏览（<Space>fn 打开）
+require("mini.files").setup()
+
+-- 删 buffer 但保留窗口布局（比 :bd 更安全，不会连带关窗口）
+require("mini.bufremove").setup()
+
 require("mini.sessions").setup({ -- dir based session management (autosave/recovery handled by remember.nvim)
 	autoread = false,
 	autowrite = false,
@@ -32,7 +38,11 @@ require("mini.sessions").setup({ -- dir based session management (autosave/recov
 require("mini.surround").setup() -- Suround selections with characters
 
 require("mini.move").setup({ -- move selection in visual mode
+	-- 注意：mappings 是整表替换而不是合并，四个方向必须写全，
+	-- 否则没写的方向（默认 H/L）会直接丢映射。
 	mappings = {
+		left = "H",
+		right = "L",
 		down = "J",
 		up = "K",
 	},
