@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bar">
+      <div class="left">
+        <span id="engine" class="chip chip-idle">NO WM</span>
+        <div id="workspaces" class="workspaces"></div>
+      </div>
+
+      <div class="center">
+        <span id="clock"></span>
+      </div>
+
+      <div class="right">
+        <span id="mode" class="chip hidden"></span>
+        <span id="paused" class="chip chip-alert hidden">PAUSED</span>
+        <span id="net" class="metric hidden"></span>
+        <span id="cpu" class="metric hidden"></span>
+        <span id="mem" class="metric hidden"></span>
+        <span id="bat" class="metric hidden"></span>
+      </div>
+    </div>
+
+    <script type="module">
+      // 唯一的运行期依赖：Zebar 官方客户端 API（CDN ESM 版）。
+      import { createProviderGroup } from 'https://esm.sh/zebar@3';
+
+      // 同时挂两个 WM provider：谁在跑就显示谁；都没跑时左侧显示 NO WM。
+      // komorebi 走 %LOCALAPPDATA%\komorebi\komorebi.sock 自动订阅，无需额外配置。
+      const providers = createProviderGroup({
+        glazewm: { type: 'glazewm' },
+        komorebi: { type: 'komorebi' },
+        date: { type: 'date', formatting: 'EEE HH:mm' },
+        cpu: { type: 'cpu' },
+        memory: { type: 'memory' },
+        battery: { type: 'battery' },
+        network: { type: 'network' },
+      });
+
+      const $ = (id) => document.getElementById(id);
+
+      /** 文本 + 可见性一次搞定，避免每个分支都写 classList 操作。 */
+      function setText(id, text, show = true) {
+        const node = $(id);
+        node.textContent = text ?? '';
+        node.classList.toggle('hidden', !show || !text);
+      }
+
+      // 与 ~/.glzr/glazewm/config.yaml 的 workspaces 数量保持一致。
+      // glaze 的 query 只返回“已存在”的工作区，这里显式铺满 9 个，
+      // 与 komorebi 固定 9 个工作区的观感对齐（点击未创建的会按需创建）。
+      const WORKSPACE_COUNT = 9;
+
+      function renderWorkspaces(o) {
+        const box = $('workspaces');
+        box.replaceChildren();
+
+        const gz = o.glazewm;
+        if (gz) {
+          const byName = new Map(
+            (gz.currentWorkspaces ?? []).map((ws) => [ws.name, ws]),
+          );
+          for (let i = 1; i <= WORKSPACE_COUNT; i += 1) {
+            const name = String(i);
+            const ws = byName.get(name);
+            const btn = document.createElement('button');
+            btn.className =
+              'ws' +
+              (ws?.hasFocus ? ' focused' : '') +
+              (ws?.isDisplayed ? ' displayed' : '');
+            btn.textContent = ws?.displayName ?? name;
+            btn.title = `workspace ${name}`;
+            btn.addEventListener('click', () => {
+              gz.runCommand(`focus --workspace ${name}`).catch(() => {});
+            });
+            box.appendChild(btn);
+          }
+          return 'glazewm';
+        }
+
+        const kb = o.komorebi;
+        if (kb?.currentWorkspaces?.length) {
+          const focusedIdx = kb.currentMonitor?.focusedWorkspaceIndex ?? -1;
+          kb.currentWorkspaces.forEach((ws, i) => {
+            const node = document.createElement('span');
+            node.className = 'ws' + (i === focusedIdx ? ' focused' : '');
+            node.textContent = ws.name ?? String(i + 1);
+            box.appendChild(node);
+          });
+          return 'komorebi';
+        }
+
+        return null;
+      }
+
+      function renderMode(o, engine) {
+        const gz = o.glazewm;
+        const kb = o.komorebi;
+
+        if (engine === 'glazewm' && gz) {
+          const dir = gz.tilingDirection === 'horizontal' ? 'H' : 'V';
+          const modes = (gz.bindingModes ?? [])
+            .map((m) => m.displayName ?? m.name)
+            .join('+');
+          setText('mode', modes ? `${dir} · ${modes}` : dir);
+          setText('paused', 'PAUSED', gz.isPaused === true);
+          return;
+        }
+
+        if (engine === 'komorebi' && kb) {
+          // zebar 3.3 的 komorebi 类型定义不认识 0.1.41 新增布局（Scrolling/
+          // RightMainVerticalStack 等），会统一报成 custom；此时宁可不显示
+          const layout = kb.focusedWorkspace?.layout;
+          const label = layout && layout !== 'custom' ? layout.replaceAll('_', ' ').toUpperCase() : '';
+          setText('mode', label);
+          setText('paused', '', false);
+          return;
+        }
+
+        setText('mode', '', false);
+        setText('paused', '', false);
+      }
+
+      function renderSystem(o) {
+        const cpu = o.cpu;
+        setText('cpu', cpu ? `CPU ${Math.round(cpu.usage)}%` : '');
+        if (cpu) {
+          $('cpu').classList.toggle('high', cpu.usage > 85);
+        }
+
+        const mem = o.memory;
+        setText('mem', mem ? `RAM ${Math.round(mem.usage)}%` : '');
+
+        const bat = o.battery;
+        setText(
+          'bat',
+          bat
+            ? `BAT ${Math.round(bat.chargePercent)}%${bat.isCharging ? ' +' : ''}`
+            : '',
+        );
+
+        const net = o.network;
+        const iface = net?.defaultInterface;
+        let netText = '';
+        if (net) {
+          if (iface?.type === 'wifi') {
+            const ssid = net.defaultGateway?.ssid;
+            netText = ssid ? `WiFi ${ssid}` : 'WiFi';
+          } else if (iface?.type === 'ethernet') {
+            netText = 'ETH';
+          } else if (iface?.type) {
+            netText = iface.type.toUpperCase();
+          } else {
+            netText = 'OFFLINE';
+          }
+        }
+        setText('net', netText);
+      }
+
+      function render() {
+        const o = providers.outputMap;
+
+        setText('clock', o.date?.formatted);
+
+        const engine = renderWorkspaces(o);
+        setText('engine', engine ? engine.toUpperCase() : 'NO WM');
+        $('engine').classList.toggle('chip-idle', !engine);
+
+        renderMode(o, engine);
+        renderSystem(o);
+      }
+
+      providers.onOutput(render);
+      render();
+    </script>
+  </body>
+</html>

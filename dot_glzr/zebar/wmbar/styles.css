@@ -1,0 +1,130 @@
+/* Zebar 顶栏 —— 刻意不引入图标字体（离线可用），只用文字 + 克制的色彩层次 */
+
+:root {
+  --fg: rgb(205 214 244 / 92%);
+  --fg-dim: rgb(148 160 190 / 75%);
+  --accent: #7aa2f7;
+  --accent-soft: rgb(122 162 247 / 18%);
+  --alert: #e0af68;
+  --surface: rgb(255 255 255 / 6%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: linear-gradient(rgb(16 18 27 / 92%), rgb(16 18 27 / 82%));
+  color: var(--fg);
+  font-family: 'Cascadia Mono', 'JetBrains Mono', Consolas, ui-monospace,
+    monospace;
+  font-size: 12px;
+  line-height: 1;
+  border-bottom: 1px solid rgb(122 162 247 / 14%);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  gap: 12px;
+  cursor: default;
+  user-select: none;
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+.center {
+  justify-self: center;
+  color: var(--fg-dim);
+  letter-spacing: 0.06em;
+}
+
+.workspaces {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 工作区胶囊：focused 用实心强调，displayed（占屏但无焦点）用淡描边 */
+.ws {
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--fg-dim);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 120ms linear, color 120ms linear;
+}
+
+.ws.displayed {
+  border-color: rgb(122 162 247 / 35%);
+  color: var(--fg);
+}
+
+.ws.focused {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: #c8d8ff;
+}
+
+.ws:hover {
+  background: rgb(122 162 247 / 12%);
+}
+
+/* 状态胶囊：引擎名 / 布局 / 暂停 */
+.chip {
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.chip-idle {
+  background: rgb(224 175 104 / 12%);
+  color: var(--alert);
+}
+
+.chip-alert {
+  background: rgb(224 175 104 / 18%);
+  color: var(--alert);
+}
+
+.metric {
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.metric.high {
+  color: #f7768e;
+}
+
+.hidden {
+  display: none;
+}
